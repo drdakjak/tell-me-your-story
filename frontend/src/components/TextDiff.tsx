@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { diff_match_patch } from 'diff-match-patch';
+import ReactMarkdown from 'react-markdown';
+import DiffSection from './DiffSection';
 
 interface TextDiffProps {
   originalText: string;
@@ -12,8 +14,9 @@ interface Section {
 }
 
 const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
-  const [finalText, setFinalText] = useState(originalText);
-  const [sections, setSections] = useState<Section[]>([]);
+  const [currentText, setCurrentText] = useState(originalText);
+  const [sections, setSections] = useState<any[]>([]);
+  const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
   const dmp = new diff_match_patch();
 
   useEffect(() => {
@@ -30,11 +33,23 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
         originalContent: originalSection.content,
         modifiedContent: modifiedSection.content,
         diffs,
+        hasChanges: diffs.some(([type]) => type !== 0),
+        isAccepted: false,
+        isRejected: false,
       };
     });
 
     setSections(newSections);
   }, [originalText, modifiedText]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktopView(window.innerWidth >= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const splitIntoSections = (text: string): Section[] => {
     const lines = text.split('\n');
@@ -60,82 +75,63 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
   };
 
   const handleAcceptSection = (index: number) => {
-    const newFinalText = finalText.split('\n');
-    const sectionStart = newFinalText.findIndex((line) => line === sections[index].header);
+    const newSections = [...sections];
+    newSections[index].isAccepted = true;
+    newSections[index].isRejected = false;
+    setSections(newSections);
+
+    updateCurrentText(index, newSections[index].modifiedContent);
+  };
+
+  const handleRejectSection = (index: number) => {
+    const newSections = [...sections];
+    newSections[index].isRejected = true;
+    newSections[index].isAccepted = false;
+    setSections(newSections);
+
+    updateCurrentText(index, newSections[index].originalContent);
+  };
+
+  const updateCurrentText = (index: number, newContent: string) => {
+    const newText = currentText.split('\n');
+    const sectionStart = newText.findIndex((line) => line === sections[index].header);
     const sectionEnd = sectionStart + sections[index].originalContent.split('\n').length;
-    newFinalText.splice(sectionStart + 1, sectionEnd - sectionStart - 1, ...sections[index].modifiedContent.trim().split('\n'));
-    setFinalText(newFinalText.join('\n'));
-  };
-
-  const handleDiscardSection = (index: number) => {
-    const newFinalText = finalText.split('\n');
-    const sectionStart = newFinalText.findIndex((line) => line === sections[index].header);
-    const sectionEnd = sectionStart + sections[index].modifiedContent.split('\n').length;
-    newFinalText.splice(sectionStart + 1, sectionEnd - sectionStart - 1, ...sections[index].originalContent.trim().split('\n'));
-    setFinalText(newFinalText.join('\n'));
-  };
-
-  const handleAcceptAll = () => {
-    setFinalText(modifiedText);
-  };
-
-  const handleDiscardAll = () => {
-    setFinalText(originalText);
+    newText.splice(sectionStart + 1, sectionEnd - sectionStart - 1, ...newContent.trim().split('\n'));
+    setCurrentText(newText.join('\n'));
   };
 
   return (
     <div className="p-4 border rounded shadow-lg bg-gray-100">
-      <div className="mb-4 text-lg font-bold">CV Text Diff</div>
-      <div className="mb-4 font-mono text-sm">
-        {sections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-4 border-b pb-4">
-            <div className="font-bold mb-2">{section.header}</div>
-            <div className="whitespace-pre-wrap">
-              {section.diffs.map((diff, index) => {
-                const [type, text] = diff;
-                let className = '';
-                if (type === -1) {
-                  className = 'bg-red-100 line-through';
-                } else if (type === 1) {
-                  className = 'bg-green-100';
-                }
-                return <span key={index} className={className}>{text}</span>;
-              })}
-            </div>
-            <div className="mt-2 flex justify-end space-x-2">
-              <button
-                onClick={() => handleAcceptSection(sectionIndex)}
-                className="px-2 py-1 text-xs text-white bg-green-500 rounded hover:bg-green-600"
-              >
-                Accept Section
-              </button>
-              <button
-                onClick={() => handleDiscardSection(sectionIndex)}
-                className="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600"
-              >
-                Discard Section
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="mb-4 flex justify-between items-center">
+        <div className="text-lg font-bold">CV Text Diff</div>
+        <button
+          onClick={() => setIsDesktopView(!isDesktopView)}
+          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Switch to {isDesktopView ? 'Mobile' : 'Desktop'} View
+        </button>
       </div>
-      <div className="flex justify-end space-x-2">
-        <button
-          onClick={handleAcceptAll}
-          className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
-        >
-          Accept All
-        </button>
-        <button
-          onClick={handleDiscardAll}
-          className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-        >
-          Discard All
-        </button>
+      <div className={`mb-4 font-mono text-sm ${isDesktopView ? 'md:flex' : ''}`}>
+        <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
+          <h2 className="text-lg font-semibold mb-2">Original Text</h2>
+          <ReactMarkdown>{originalText}</ReactMarkdown>
+        </div>
+        <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
+          <h2 className="text-lg font-semibold mb-2">Diff Sections</h2>
+          {sections.map((section, index) => (
+            <DiffSection
+              key={index}
+              section={section}
+              index={index}
+              onAccept={handleAcceptSection}
+              onReject={handleRejectSection}
+            />
+          ))}
+        </div>
       </div>
       <div className="mt-4">
-        <div className="font-bold">Final Text:</div>
-        <div className="whitespace-pre-wrap font-mono text-sm">{finalText}</div>
+        <div className="font-bold">Current Text:</div>
+        <ReactMarkdown>{currentText}</ReactMarkdown>
       </div>
     </div>
   );

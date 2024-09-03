@@ -1,13 +1,13 @@
-import './App.css'
-import Layout from './components/Layout'
-import TextDiffComponent from './components/TextDiff'
+import React from 'react';
+import './App.css';
+import Layout from './components/Layout';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="App">
       <Layout />
     </div>
   );
-}
+};
 
-export default App
+export default App;
