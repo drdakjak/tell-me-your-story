@@ -111,23 +111,23 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
           Switch to {isDesktopView ? 'Mobile' : 'Desktop'} View
         </button>
       </div>
-      <div className={`mb-4 font-mono text-sm ${isDesktopView ? 'md:flex' : ''}`}>
-        <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
-          <h2 className="text-lg font-semibold mb-2">Original Text</h2>
-          <ReactMarkdown>{originalText}</ReactMarkdown>
-        </div>
-        <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
-          <h2 className="text-lg font-semibold mb-2">Diff Sections</h2>
-          {sections.map((section, index) => (
-            <DiffSection
-              key={index}
-              section={section}
-              index={index}
-              onAccept={handleAcceptSection}
-              onReject={handleRejectSection}
-            />
-          ))}
-        </div>
+      <div className={`mb-4 font-mono text-sm ${isDesktopView ? 'md:flex flex-col' : ''}`}>
+        {sections.map((section, index) => (
+          <div key={index} className={`mb-4 ${isDesktopView ? 'md:flex' : ''}`}>
+            <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
+              <h3 className="text-md font-semibold mb-2">{section.header}</h3>
+              <ReactMarkdown>{section.originalContent}</ReactMarkdown>
+            </div>
+            <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
+              <DiffSection
+                section={section}
+                index={index}
+                onAccept={handleAcceptSection}
+                onReject={handleRejectSection}
+              />
+            </div>
+          </div>
+        ))}
       </div>
       <div className="mt-4">
         <div className="font-bold">Current Text:</div>

@@ -1178,6 +1178,10 @@ input[type="range"]::-ms-fill-lower {
   top: 1rem;
 }
 
+.right-2 {
+  right: 0.5rem;
+}
+
 .-z-10 {
   z-index: -10;
 }

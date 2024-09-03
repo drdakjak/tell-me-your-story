@@ -10,10 +10,14 @@ interface DiffSectionProps {
 }
 
 const DiffSection: React.FC<DiffSectionProps> = ({ section, index, onAccept, onReject }) => {
-  const [isChatVisible, setIsChatVisible] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const toggleChatWindow = () => {
-    setIsChatVisible(!isChatVisible);
+  const handleOpenChat = () => {
+    setIsChatOpen(true);
+  };
+
+  const handleCloseChat = () => {
+    setIsChatOpen(false);
   };
 
   return (
@@ -51,17 +55,17 @@ const DiffSection: React.FC<DiffSectionProps> = ({ section, index, onAccept, onR
       </div>
       
       <button
-        onClick={toggleChatWindow}
+        onClick={handleOpenChat}
         className="mt-2 px-2 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600"
       >
-        {isChatVisible ? 'Close Chat' : 'Open Chat'}
+        Open Chat
       </button>
-      {isChatVisible && (
-        <ChatWindow
-          sectionHeader={section.header}
-          sectionContent={section.isAccepted ? section.modifiedContent : section.originalContent}
-        />
-      )}
+      <ChatWindow
+        sectionHeader={section.header}
+        sectionContent={section.isAccepted ? section.modifiedContent : section.originalContent}
+        isOpen={isChatOpen}
+        onClose={handleCloseChat}
+      />
     </div>
   );
 };
