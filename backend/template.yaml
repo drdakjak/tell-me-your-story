@@ -1,0 +1,304 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: Api
+      StageName: Prod
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /fetch_job_description:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchJobDescription.Arn}/invocations
+              responses: {}
+          /process_job_description:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProcessJobDescription.Arn}/invocations
+              responses: {}
+          /process_resume:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProcessResume.Arn}/invocations
+              responses: {}
+          /upload_resume:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UploadResume.Arn}/invocations
+              responses: {}
+          /optimise_resume:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OptimiseResume.Arn}/invocations
+              responses: {}
+          /chat_resume:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ChatResume.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      Cors:
+        AllowOrigin: '''"*"'''
+        AllowHeaders: '''"*"'''
+        AllowMethods: '''"*"'''
+        MaxAge: 5
+  Branch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: <String>
+      BranchName: <String>
+  App:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: <String>
+  FetchJobDescription:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: FetchJobDescription
+      CodeUri: src/fetch_job_description
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        ApiPOSTfetchjobdescription:
+          Type: Api
+          Properties:
+            Path: /fetch_job_description
+            Method: POST
+            RestApiId: !Ref Api
+      Environment:
+        Variables:
+          JOBDESCRIPTIONTABLE_TABLE_NAME: !Ref JobDescriptionTable
+          JOBDESCRIPTIONTABLE_TABLE_ARN: !GetAtt JobDescriptionTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobDescriptionTable
+  FetchJobDescriptionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${FetchJobDescription}
+  ProcessJobDescription:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ProcessJobDescription
+      CodeUri: src/process_job_description
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        ApiPOSTprocessjobdescription:
+          Type: Api
+          Properties:
+            Path: /process_job_description
+            Method: POST
+            RestApiId: !Ref Api
+      Environment:
+        Variables:
+          JOBDESCRIPTIONTABLE_TABLE_NAME: !Ref JobDescriptionTable
+          JOBDESCRIPTIONTABLE_TABLE_ARN: !GetAtt JobDescriptionTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobDescriptionTable
+  ProcessJobDescriptionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ProcessJobDescription}
+  UploadResume:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: UploadResume
+      CodeUri: src/upload_resume
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
+          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ResumeTable
+      Events:
+        ApiPOSTuploadresume:
+          Type: Api
+          Properties:
+            Path: /upload_resume
+            Method: POST
+            RestApiId: !Ref Api
+  UploadResumeLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UploadResume}
+  JobDescriptionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+  ProcessResume:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ProcessResume
+      CodeUri: src/process_resume
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
+          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ResumeTable
+      Events:
+        ApiPOSTprocessresume:
+          Type: Api
+          Properties:
+            Path: /process_resume
+            Method: POST
+            RestApiId: !Ref Api
+  ProcessResumeLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ProcessResume}
+  ResumeTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+  OptimiseResume:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: OptimiseResume
+      CodeUri: src/optimise_resume
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        ApiPOSToptimiseresume:
+          Type: Api
+          Properties:
+            Path: /optimise_resume
+            Method: POST
+            RestApiId: !Ref Api
+      Environment:
+        Variables:
+          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
+          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ResumeTable
+  OptimiseResumeLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${OptimiseResume}
+  ChatResume:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ChatResume
+      CodeUri: src/chat_resume
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
+          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ResumeTable
+      Events:
+        ApiPOSTchatresume:
+          Type: Api
+          Properties:
+            Path: /chat_resume
+            Method: POST
+            RestApiId: !Ref Api
+  ChatResumeLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ChatResume}
+  UserSessionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+Metadata:
+  AWS::Composer::Groups:
+    Group:
+      Label: API
+      Members:
+        - FetchJobDescription
+        - ProcessJobDescription
+        - UploadResume
+        - ProcessResume
+        - OptimiseResume
+        - ChatResume

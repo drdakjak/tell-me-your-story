@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import TextDiffComponent from './TextDiff';
+import JobDescriptionProcessor from './JobDescriptionProcessor';
 
 const user = {
   name: 'Tom Cook',
@@ -14,6 +16,7 @@ const navigation = [
   { name: 'Projects', href: '#', current: false },
   { name: 'Calendar', href: '#', current: false },
   { name: 'Reports', href: '#', current: false },
+  { name: 'Job Description', href: '#', current: false },
 ]
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -21,7 +24,7 @@ const userNavigation = [
   { name: 'Sign out', href: '#' },
 ]
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -104,17 +107,17 @@ University of Technology | Graduated: May 2015
 - Certified Scrum Master`;
 
 export default function Layout() {
+  const [currentPage, setCurrentPage] = useState('Dashboard');
+
+  const handleNavigation = (pageName: string) => {
+    setCurrentPage(pageName);
+    navigation.forEach(item => {
+      item.current = item.name === pageName;
+    });
+  };
 
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-gray-100">
-        <body class="h-full">
-        ```
-        */}
       <div className="min-h-full">
         <Disclosure as="nav" className="bg-gray-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -133,6 +136,7 @@ export default function Layout() {
                       <a
                         key={item.name}
                         href={item.href}
+                        onClick={() => handleNavigation(item.name)}
                         aria-current={item.current ? 'page' : undefined}
                         className={classNames(
                           item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
@@ -202,6 +206,7 @@ export default function Layout() {
                   key={item.name}
                   as="a"
                   href={item.href}
+                  onClick={() => handleNavigation(item.name)}
                   aria-current={item.current ? 'page' : undefined}
                   className={classNames(
                     item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
@@ -248,19 +253,18 @@ export default function Layout() {
 
         <header className="bg-white shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-
-            
-
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{currentPage}</h1>
           </div>
         </header>
         <main>
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {/* Your content */}
-            <div className="container mx-auto px-4 py-8">
-              <TextDiffComponent originalText={originalText} modifiedText={modifiedText} />
-            </div>
-            </div>
+            {currentPage === 'Dashboard' && (
+              <div className="container mx-auto px-4 py-8">
+                <TextDiffComponent originalText={originalText} modifiedText={modifiedText} />
+              </div>
+            )}
+            {currentPage === 'Job Description' && <JobDescriptionProcessor />}
+          </div>
         </main>
       </div>
     </>
