@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ChatWindow from './ChatWindow';
-import SectionControls from './SectionControls;
+import SectionControls from './SectionControls';
 
 interface DiffSectionProps {
   section: any;
