@@ -100,6 +100,18 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
     setCurrentText(newText.join('\n'));
   };
 
+  const handleOriginalContentChange = (index: number, newContent: string) => {
+    const newSections = [...sections];
+    newSections[index].originalContent = newContent;
+    const diffs = dmp.diff_main(newContent, newSections[index].modifiedContent);
+    dmp.diff_cleanupSemantic(diffs);
+    newSections[index].diffs = diffs;
+    newSections[index].hasChanges = diffs.some(([type]) => type !== 0);
+    setSections(newSections);
+
+    updateCurrentText(index, newContent);
+  };
+
   return (
     <div className="p-4 border rounded shadow-lg bg-gray-100">
       <div className="mb-4 flex justify-between items-center">
@@ -116,7 +128,11 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
           <div key={index} className={`mb-4 ${isDesktopView ? 'md:flex' : ''}`}>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
               <h3 className="text-md font-semibold mb-2">{section.header}</h3>
-              <ReactMarkdown>{section.originalContent}</ReactMarkdown>
+              <textarea
+                value={section.originalContent}
+                onChange={(e) => handleOriginalContentChange(index, e.target.value)}
+                className="w-full h-48 p-2 border rounded resize-none"
+              />
             </div>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
               <DiffSection

@@ -1794,6 +1794,10 @@ input[type="range"]::-ms-fill-lower {
   cursor: wait;
 }
 
+.resize-none {
+  resize: none;
+}
+
 .resize {
   resize: both;
 }
