@@ -11,19 +11,19 @@ Resources:
         openapi: "3.0"
         info: {}
         paths:
-          /fetch_job_description:
+          /fetch_job_post:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchJobDescription.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchJobPost.Arn}/invocations
               responses: {}
-          /process_job_description:
+          /process_job_post:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProcessJobDescription.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProcessJobPost.Arn}/invocations
               responses: {}
           /process_resume:
             post:
@@ -69,68 +69,68 @@ Resources:
     Type: AWS::Amplify::App
     Properties:
       Name: <String>
-  FetchJobDescription:
+  FetchJobPost:
     Type: AWS::Serverless::Function
     Properties:
       Description: !Sub
         - Stack ${AWS::StackName} Function ${ResourceName}
-        - ResourceName: FetchJobDescription
-      CodeUri: src/fetch_job_description
+        - ResourceName: FetchJobPost
+      CodeUri: src/fetch_job_post
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
       Events:
-        ApiPOSTfetchjobdescription:
+        ApiPOSTFetchJobPost:
           Type: Api
           Properties:
-            Path: /fetch_job_description
+            Path: /fetch_job_post
             Method: POST
             RestApiId: !Ref Api
       Environment:
         Variables:
-          JOBDESCRIPTIONTABLE_TABLE_NAME: !Ref JobDescriptionTable
-          JOBDESCRIPTIONTABLE_TABLE_ARN: !GetAtt JobDescriptionTable.Arn
+          JobPostTable_TABLE_NAME: !Ref JobPostTable
+          JobPostTable_TABLE_ARN: !GetAtt JobPostTable.Arn
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref JobDescriptionTable
-  FetchJobDescriptionLogGroup:
+            TableName: !Ref JobPostTable
+  FetchJobPostLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
-      LogGroupName: !Sub /aws/lambda/${FetchJobDescription}
-  ProcessJobDescription:
+      LogGroupName: !Sub /aws/lambda/${FetchJobPost}
+  ProcessJobPost:
     Type: AWS::Serverless::Function
     Properties:
       Description: !Sub
         - Stack ${AWS::StackName} Function ${ResourceName}
-        - ResourceName: ProcessJobDescription
-      CodeUri: src/process_job_description
+        - ResourceName: ProcessJobPost
+      CodeUri: src/process_job_post
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
       Events:
-        ApiPOSTprocessjobdescription:
+        ApiPOSTProcessJobPost:
           Type: Api
           Properties:
-            Path: /process_job_description
+            Path: /process_job_post
             Method: POST
             RestApiId: !Ref Api
       Environment:
         Variables:
-          JOBDESCRIPTIONTABLE_TABLE_NAME: !Ref JobDescriptionTable
-          JOBDESCRIPTIONTABLE_TABLE_ARN: !GetAtt JobDescriptionTable.Arn
+          JobPostTable_TABLE_NAME: !Ref JobPostTable
+          JobPostTable_TABLE_ARN: !GetAtt JobPostTable.Arn
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref JobDescriptionTable
-  ProcessJobDescriptionLogGroup:
+            TableName: !Ref JobPostTable
+  ProcessJobPostLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
-      LogGroupName: !Sub /aws/lambda/${ProcessJobDescription}
+      LogGroupName: !Sub /aws/lambda/${ProcessJobPost}
   UploadResume:
     Type: AWS::Serverless::Function
     Properties:
@@ -162,7 +162,7 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${UploadResume}
-  JobDescriptionTable:
+  JobPostTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -296,8 +296,8 @@ Metadata:
     Group:
       Label: API
       Members:
-        - FetchJobDescription
-        - ProcessJobDescription
+        - FetchJobPost
+        - ProcessJobPost
         - UploadResume
         - ProcessResume
         - OptimiseResume

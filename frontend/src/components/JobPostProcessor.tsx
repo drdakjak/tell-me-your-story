@@ -1,32 +1,32 @@
 import React, { useState } from 'react';
 import { post } from 'aws-amplify/api';
 
-const JobDescriptionProcessor: React.FC = () => {
+const JobPostProcessor: React.FC = () => {
   const [url, setUrl] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
+  const [jobPost, setJobPost] = useState('');
   const [requirements, setRequirements] = useState<{ text: string; type: 'required' | 'nice to have' }[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchJobDescription = async () => {
+  const FetchJobPost = async () => {
     setIsLoading(true);
     setError('');
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch job description');
+        throw new Error('Failed to fetch job post');
       }
       const text = await response.text();
-      setJobDescription(text);
+      setJobPost(text);
     } catch (err) {
-      setError('Error fetching job description. Please check the URL and try again.');
+      setError('Error fetching job post. Please check the URL and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const analyzeJobDescription = async () => {
+  const analyzeJobPost = async () => {
     setIsLoading(true);
     setError('');
     try {
@@ -34,20 +34,20 @@ const JobDescriptionProcessor: React.FC = () => {
         apiName: 'JobAnalysisAPI',
         path: '/analyze',
         options: {
-          body: { jobDescription }
+          body: { jobPost }
         }
       });
 
       const { data, response } = await restOperation.response;
 
       if (!response.ok) {
-        throw new Error('Failed to analyze job description');
+        throw new Error('Failed to analyze job post');
       }
 
       setRequirements(data.requirements);
       setKeywords(data.keywords);
     } catch (err) {
-      setError('Error analyzing job description. Please try again.');
+      setError('Error analyzing job post. Please try again.');
       console.error('Error:', err);
     } finally {
       setIsLoading(false);
@@ -63,7 +63,7 @@ const JobDescriptionProcessor: React.FC = () => {
         path: '/save',
         options: {
           body: {
-            jobDescription,
+            jobPost,
             requirements,
             keywords
           }
@@ -88,11 +88,11 @@ const JobDescriptionProcessor: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Job Description Analysis</h1>
+      <h1 className="text-3xl font-bold mb-6">Job Post Analysis</h1>
       
       <div className="mb-6">
         <label htmlFor="url-input" className="block text-sm font-medium text-gray-700 mb-2">
-          Job Description URL
+          Job Post URL
         </label>
         <div className="flex">
           <input
@@ -101,10 +101,10 @@ const JobDescriptionProcessor: React.FC = () => {
             className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com/job-description"
+            placeholder="https://example.com/job-post"
           />
           <button
-            onClick={fetchJobDescription}
+            onClick={FetchJobPost}
             disabled={isLoading}
             className="bg-indigo-600 text-white px-4 py-2 rounded-r-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
@@ -114,23 +114,23 @@ const JobDescriptionProcessor: React.FC = () => {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="job-description" className="block text-sm font-medium text-gray-700 mb-2">
-          Job Description
+        <label htmlFor="job-post" className="block text-sm font-medium text-gray-700 mb-2">
+          Job Post
         </label>
         <textarea
-          id="job-description"
+          id="job-post"
           rows={10}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Paste or enter job description here"
+          value={jobPost}
+          onChange={(e) => setJobPost(e.target.value)}
+          placeholder="Paste or enter job post here"
         ></textarea>
       </div>
 
       <div className="flex justify-between mb-6">
         <button
-          onClick={analyzeJobDescription}
-          disabled={isLoading || !jobDescription}
+          onClick={analyzeJobPost}
+          disabled={isLoading || !jobPost}
           className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
           Extract Requirements and Keywords
@@ -176,4 +176,4 @@ const JobDescriptionProcessor: React.FC = () => {
   );
 };
 
-export default JobDescriptionProcessor;
+export default JobPostProcessor;

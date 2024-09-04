@@ -33,14 +33,14 @@ class AgentState(TypedDict):
 
 def get_job_requirements(state: AgentState):
     messages = [
-        SystemMessage(content=JOB_DESCRIPTION_ANALYST),
-        HumanMessage(content=state['job_description'])
+        SystemMessage(content=JOB_POST_ANALYST),
+        HumanMessage(content=state['job_post'])
     ]
 
     processed_resume = state['model'].with_structured_output(ProcessedResume).invoke(messages)
     return processed_resume
 
-def job_description_analyst_node(state: AgentState):
+def JOB_POST_ANALYST_node(state: AgentState):
 
     processed_resume = get_job_requirements(state)
     

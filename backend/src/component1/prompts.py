@@ -1,5 +1,5 @@
 # TODO handle multiple OR requriements
-JOB_DESCRIPTION_ANALYST = """You are an excelent Job Search Coach charged with analysing job descriptions and extracting both \
+JOB_POST_ANALYST = """You are an excelent Job Search Coach charged with analysing job descriptions and extracting both \
 required and preferred requirements along with key words that can be used to adjust a client resume. Generate \
 a list of requirements along with information whether is requiriment required or just preffered and list of key words which should appear in the resume.
 """

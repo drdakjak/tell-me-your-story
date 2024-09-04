@@ -1,0 +1,10 @@
+selenium 
+langchain_community
+python-dotenv
+langchain_core
+langchain_openai
+webdriver_manager
+selenium-wire
+beautifulsoup4
+langchain_anthropic
+blinker==1.7.0

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import TextDiffComponent from './TextDiff';
-import JobDescriptionProcessor from './JobDescriptionProcessor';
+import JobPostProcessor from './JobPostProcessor';
 
 const user = {
   name: 'Tom Cook',
@@ -16,7 +16,7 @@ const navigation = [
   { name: 'Projects', href: '#', current: false },
   { name: 'Calendar', href: '#', current: false },
   { name: 'Reports', href: '#', current: false },
-  { name: 'Job Description', href: '#', current: false },
+  { name: 'Job Post', href: '#', current: false },
 ]
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -263,7 +263,7 @@ export default function Layout() {
                 <TextDiffComponent originalText={originalText} modifiedText={modifiedText} />
               </div>
             )}
-            {currentPage === 'Job Description' && <JobDescriptionProcessor />}
+            {currentPage === 'Job Post' && <JobPostProcessor />}
           </div>
         </main>
       </div>
