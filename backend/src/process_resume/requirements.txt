@@ -1,1 +1,4 @@
 langchain_core
+langchain_openai
+langchain_anthropic
+python-dotenv
