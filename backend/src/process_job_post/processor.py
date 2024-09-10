@@ -1,11 +1,8 @@
-from typing import List
-
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.pydantic_v1 import BaseModel, Field
 
-from .clients import get_model
-from .config import MODEL_NAME
-from .prompt import JOB_POST_ANALYST
+from clients import get_model
+from config import MODEL_NAME
+from prompt import JOB_POST_ANALYST
 
 def process_job_post(text: str) -> str:
     
@@ -16,5 +13,5 @@ def process_job_post(text: str) -> str:
         HumanMessage(content=text),
     ]
     response = model.invoke(messages)
-
-    return response
+    content = response.content
+    return content

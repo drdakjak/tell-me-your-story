@@ -8,7 +8,7 @@ Resources:
         - ResourceName: Api
       StageName: Prod
       DefinitionBody:
-        openapi: "3.0"
+        openapi: '3.0'
         info: {}
         paths:
           /fetch_job_post:
@@ -53,6 +53,20 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ChatResume.Arn}/invocations
               responses: {}
+          /invoke_chat:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${InvokeChat.Arn}/invocations
+              responses: {}
+          /reset_chat:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ResetChat.Arn}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       Cors:
@@ -60,15 +74,18 @@ Resources:
         AllowHeaders: '''"*"'''
         AllowMethods: '''"*"'''
         MaxAge: 5
-  Branch:
-    Type: AWS::Amplify::Branch
-    Properties:
-      AppId: <String>
-      BranchName: <String>
-  App:
-    Type: AWS::Amplify::App
-    Properties:
-      Name: <String>
+
+  # Branch:
+  #   Type: AWS::Amplify::Branch
+  #   Properties:
+  #     AppId: <String>
+  #     BranchName: <String>
+
+  # App:
+  #   Type: AWS::Amplify::App
+  #   Properties:
+  #     Name: <String>
+
   FetchJobPost:
     Type: AWS::Serverless::Function
     Properties:
@@ -78,9 +95,14 @@ Resources:
       CodeUri: src/fetch_job_post
       Handler: handler.handler
       Runtime: python3.11
-      MemorySize: 3008
+      MemorySize: 128
       Timeout: 30
       Tracing: Active
+      Environment:
+        Variables:
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Events:
         ApiPOSTFetchJobPost:
           Type: Api
@@ -88,18 +110,13 @@ Resources:
             Path: /fetch_job_post
             Method: POST
             RestApiId: !Ref Api
-      Environment:
-        Variables:
-          JobPostTable_TABLE_NAME: !Ref JobPostTable
-          JobPostTable_TABLE_ARN: !GetAtt JobPostTable.Arn
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobPostTable
+
   FetchJobPostLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${FetchJobPost}
+
   ProcessJobPost:
     Type: AWS::Serverless::Function
     Properties:
@@ -109,7 +126,7 @@ Resources:
       CodeUri: src/process_job_post
       Handler: handler.handler
       Runtime: python3.11
-      MemorySize: 3008
+      MemorySize: 128
       Timeout: 30
       Tracing: Active
       Events:
@@ -121,16 +138,20 @@ Resources:
             RestApiId: !Ref Api
       Environment:
         Variables:
-          JobPostTable_TABLE_NAME: !Ref JobPostTable
-          JobPostTable_TABLE_ARN: !GetAtt JobPostTable.Arn
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref JobPostTable
+            TableName: !Ref UserTable
+
   ProcessJobPostLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${ProcessJobPost}
+
   UploadResume:
     Type: AWS::Serverless::Function
     Properties:
@@ -140,16 +161,14 @@ Resources:
       CodeUri: src/upload_resume
       Handler: handler.handler
       Runtime: python3.11
-      MemorySize: 3008
+      MemorySize: 128
       Timeout: 30
       Tracing: Active
       Environment:
         Variables:
-          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
-          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ResumeTable
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Events:
         ApiPOSTuploadresume:
           Type: Api
@@ -157,23 +176,13 @@ Resources:
             Path: /upload_resume
             Method: POST
             RestApiId: !Ref Api
+
   UploadResumeLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${UploadResume}
-  JobPostTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
+
   ProcessResume:
     Type: AWS::Serverless::Function
     Properties:
@@ -183,16 +192,9 @@ Resources:
       CodeUri: src/process_resume
       Handler: handler.handler
       Runtime: python3.11
-      MemorySize: 3008
+      MemorySize: 128
       Timeout: 30
       Tracing: Active
-      Environment:
-        Variables:
-          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
-          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ResumeTable
       Events:
         ApiPOSTprocessresume:
           Type: Api
@@ -200,23 +202,21 @@ Resources:
             Path: /process_resume
             Method: POST
             RestApiId: !Ref Api
+      Environment:
+        Variables:
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+
   ProcessResumeLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${ProcessResume}
-  ResumeTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
+
   OptimiseResume:
     Type: AWS::Serverless::Function
     Properties:
@@ -226,8 +226,8 @@ Resources:
       CodeUri: src/optimise_resume
       Handler: handler.handler
       Runtime: python3.11
-      MemorySize: 3008
-      Timeout: 30
+      MemorySize: 128
+      Timeout: 180
       Tracing: Active
       Events:
         ApiPOSToptimiseresume:
@@ -238,16 +238,19 @@ Resources:
             RestApiId: !Ref Api
       Environment:
         Variables:
-          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
-          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref ResumeTable
+            TableName: !Ref UserTable
+
   OptimiseResumeLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${OptimiseResume}
+
   ChatResume:
     Type: AWS::Serverless::Function
     Properties:
@@ -257,16 +260,16 @@ Resources:
       CodeUri: src/chat_resume
       Handler: handler.handler
       Runtime: python3.11
-      MemorySize: 3008
+      MemorySize: 128
       Timeout: 30
       Tracing: Active
       Environment:
         Variables:
-          RESUMETABLE_TABLE_NAME: !Ref ResumeTable
-          RESUMETABLE_TABLE_ARN: !GetAtt ResumeTable.Arn
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ResumeTable
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+          OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          SESSIONTABLE_TABLE_NAME: !Ref SessionTable
+          SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
       Events:
         ApiPOSTchatresume:
           Type: Api
@@ -274,23 +277,124 @@ Resources:
             Path: /chat_resume
             Method: POST
             RestApiId: !Ref Api
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionTable
+
   ChatResumeLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${ChatResume}
-  UserSessionTable:
+
+  UserTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      TableName: UserTable
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
-      BillingMode: PAY_PER_REQUEST
       KeySchema:
         - AttributeName: id
           KeyType: HASH
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  SessionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SessionTable
+      AttributeDefinitions:
+        - AttributeName: SessionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: SessionId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AliasAttributes:
+        - email
+        - preferred_username
+      UserPoolName: !Sub ${AWS::StackName}-UserPool
+
+  InvokeChat:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: InvokeChat
+      CodeUri: src/invoke_chat
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          SESSIONTABLE_TABLE_NAME: !Ref SessionTable
+          SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionTable
+      Events:
+        ApiPOSTinvokechat:
+          Type: Api
+          Properties:
+            Path: /invoke_chat
+            Method: POST
+            RestApiId: !Ref Api
+
+  InvokeChatLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${InvokeChat}
+
+  ResetChat:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ResetChat
+      CodeUri: src/reset_chat
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          SESSIONTABLE_TABLE_NAME: !Ref SessionTable
+          SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionTable
+      Events:
+        ApiPOSTresetchat:
+          Type: Api
+          Properties:
+            Path: /reset_chat
+            Method: POST
+            RestApiId: !Ref Api
+
+  ResetChatLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ResetChat}
+
 Metadata:
   AWS::Composer::Groups:
     Group:
@@ -302,3 +406,5 @@ Metadata:
         - ProcessResume
         - OptimiseResume
         - ChatResume
+        - ResetChat
+        - InvokeChat

@@ -1,3 +1,6 @@
+import logging
+
+from math import log
 from typing import TypedDict, Annotated, List
 from httpx import get
 from langchain_core.pydantic_v1 import BaseModel, Field
@@ -9,34 +12,23 @@ from clients import get_model
 from config import MODEL_NAME
 
 MODEL = get_model(MODEL_NAME)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-
-def format_job_requirements(job_requirements: List[str]) -> str:
-    return "\n".join(
-        [
-            f"- {'Required' if requirement['required'] else 'Nice to have'}: {requirement['requirement']}"
-            for requirement in job_requirements
-        ]
-    )
-
-
-def format_key_words(key_words: List[str]) -> str:
-    return "\n".join([f"- {key_word} " for key_word in key_words])
-
+def format_job_requirements(job_requirements) -> str:
+    return f"\n{job_requirements}\n"
 
 def format_section(section) -> str:
-    section_formatted = f"Section:\n{section['title']}\n{section['content']}"
+    section_formatted = f"\nSection:\n{section['title']}\n{section['content']}\n"
     return section_formatted
 
 def format_advice(advice) -> str:
-    return f"\n\nExpert Advice: {advice}"
+    return f"\nExpert Advice: {advice}\n"
 
 def get_advice(state: AgentState):
 
     system_prompt = RESUME_ADVICER.format(
-        job_post=state["job_post"],
         job_requirements=format_job_requirements(state["job_requirements"]),
-        key_words=format_key_words(state["key_words"]),
     )
     user_prompt = format_section(state["current_section"])
 
@@ -45,7 +37,8 @@ def get_advice(state: AgentState):
         HumanMessage(content=user_prompt),
     ]
     response = MODEL.invoke(messages)
-    return response
+    content = response.content
+    return content
 
 
 def adviser_node(state: AgentState):
@@ -58,10 +51,8 @@ def adviser_node(state: AgentState):
 def get_revised_section(state: AgentState):
 
     system_promp = RESUME_WRITER.format(
-        job_post=state["job_post"],
         job_requirements=format_job_requirements(state["job_requirements"]),
-        key_words=format_key_words(state["key_words"]),
-        original_resume=state["original_resume"],
+        # original_resume=state["original_resume"],
     )
     user_prompt = format_section(state["current_section"])
 
@@ -70,7 +61,10 @@ def get_revised_section(state: AgentState):
         HumanMessage(content=user_prompt),
     ]
     response = MODEL.invoke(messages)
-    return response
+    content = response.content
+    logger.info(content)
+    print(content)
+    return content
 
 
 def writer_node(state: AgentState):
@@ -81,9 +75,7 @@ def writer_node(state: AgentState):
 def get_feedback(state: AgentState):
 
     system_promp = MANAGER.format(
-        job_post=state["job_post"],
         job_requirements=format_job_requirements(state["job_requirements"]),
-        key_words=format_key_words(state["key_words"]),
     )
     user_prompt = format_section(state["current_section"])
     user_prompt += format_advice(state["advice"])
@@ -92,7 +84,8 @@ def get_feedback(state: AgentState):
         HumanMessage(content=user_prompt),
     ]
     response = MODEL.invoke(messages)
-    return response
+    content = response.content
+    return content
 
 
 def manager_node(state: AgentState):

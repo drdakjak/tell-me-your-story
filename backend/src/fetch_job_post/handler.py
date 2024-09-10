@@ -6,7 +6,6 @@ from job_post_extractor import extract_job_post_text
 
 def handler(event, context):
     try:
-        event = json.dumps(event)
         url = event["body"]["url"]
 
         extracted_text = extract_text_from_url(url)

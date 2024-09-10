@@ -18,7 +18,7 @@ def build_workflow():
     workflow.add_edge("adviser", "writer")
     # workflow.add_edge("writer", "manager")
 
-    section_workflow = workflow.compile(checkpointer=MemorySaver())
+    section_workflow = workflow.compile() # TODO: checkpointer=MemorySaver()
     return section_workflow
 
 

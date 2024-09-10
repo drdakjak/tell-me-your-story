@@ -7,4 +7,5 @@ webdriver_manager
 selenium-wire
 beautifulsoup4
 langchain_anthropic
+chromedriver-py
 blinker==1.7.0

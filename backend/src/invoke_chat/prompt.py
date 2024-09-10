@@ -1,0 +1,1 @@
+INIT_PROMPT = "You are expert resume section writer."
