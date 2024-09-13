@@ -6,9 +6,6 @@ from clients import get_user_table
 
 user_table = get_user_table()
 
-import concurrent.futures
-
-
 def process_resume_section(resume_section, workflow, job_requirements, original_resume):
     keys_to_include = ["advice", "tailored_section"]
     if resume_section["content"]:
@@ -21,28 +18,27 @@ def process_resume_section(resume_section, workflow, job_requirements, original_
         )
         tailored_section = {key: final_state[key] for key in keys_to_include}
     else:
-        tailored_section = {key: "" for key in keys_to_include}
+        tailored_section = {
+            "advice": "",
+            "tailored_section": resume_section
+        }
+
     return tailored_section
 
 
 def get_tailored_resume(semantic_sections, job_requirements, original_resume):
     workflow = build_workflow()
-    tailored_resume = []
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(
-                process_resume_section,
-                section,
-                workflow,
-                job_requirements,
-                original_resume,
-            )
-            for section in semantic_sections
-        ]
-        for future in concurrent.futures.as_completed(futures):
-            tailored_resume.append(future.result())
+        tailored_resume = executor.map(
+            process_resume_section,
+            semantic_sections,
+            [workflow] * len(semantic_sections),
+            [job_requirements] * len(semantic_sections),
+            [original_resume] * len(semantic_sections)
+        )
 
+    tailored_resume = list(tailored_resume)
     return tailored_resume
 
 
@@ -58,7 +54,6 @@ def handler(event, context):
         tailored_resume = get_tailored_resume(
             semantic_sections, job_requirements, original_resume
         )
-
         user_table.update_item(
             Key={"id": user_id},
             UpdateExpression="SET tailored_resume = :tailored_resume",

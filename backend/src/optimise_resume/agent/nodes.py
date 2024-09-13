@@ -1,6 +1,8 @@
 import logging
 
 from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.pydantic_v1 import BaseModel, Field
+from typing_extensions import Annotated, TypedDict
 
 from .state import AgentState
 from .prompts import RESUME_WRITER, RESUME_ADVICER, MANAGER
@@ -11,15 +13,21 @@ MODEL = get_model(MODEL_NAME)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+
 def format_job_requirements(job_requirements) -> str:
     return f"\n{job_requirements}\n"
 
+
 def format_section(section) -> str:
-    section_formatted = f"\nSection:\n{section['title']}\n{section['content']}\n"
+    section_formatted = (
+        f"\nSection:\n\nTitle:\n{section['title']}\n\nContent:\n{section['content']}\n"
+    )
     return section_formatted
+
 
 def format_advice(advice) -> str:
     return f"\nExpert Advice: {advice}\n"
+
 
 def get_advice(state: AgentState):
 
@@ -44,11 +52,25 @@ def adviser_node(state: AgentState):
     return {"advice": advice}
 
 
+class TailoredSection(TypedDict):
+    """The section with the tailored title and content"""
+
+    title: Annotated[
+        str,
+        ...,
+        "The tailored section's title",
+    ]
+    content: Annotated[
+        str,
+        ...,
+        "The tailored section's content only that does not contains the title of the section",
+    ]
+
+
 def get_tailored_section(state: AgentState):
 
     system_promp = RESUME_WRITER.format(
         job_requirements=format_job_requirements(state["job_requirements"]),
-        # original_resume=state["original_resume"],
     )
     user_prompt = format_section(state["current_section"])
 
@@ -56,9 +78,9 @@ def get_tailored_section(state: AgentState):
         SystemMessage(content=system_promp),
         HumanMessage(content=user_prompt),
     ]
-    response = MODEL.invoke(messages)
-    content = response.content
-    return content
+    tailored_section = MODEL.with_structured_output(TailoredSection).invoke(messages)
+    tailored_section["section_id"] = state["current_section"]["section_id"]
+    return tailored_section
 
 
 def writer_node(state: AgentState):
