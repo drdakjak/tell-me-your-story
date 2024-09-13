@@ -16,7 +16,7 @@ def get_message_history(conversation_id: str):
 def handler(event, context):
     try:
         conversation_id = event['body']['conversation_id']
-        response = get_message_history(conversation_id=conversation_id).clear()
+        _ = get_message_history(conversation_id=conversation_id).clear()
 
         return {
             'statusCode': 200,

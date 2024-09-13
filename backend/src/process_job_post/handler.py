@@ -1,6 +1,6 @@
 import json
 
-from backend.src.process_job_post.processor import process_job_post 
+from processor import process_job_post 
 from clients import get_user_table
 
 user_table = get_user_table()
@@ -14,7 +14,7 @@ def handler(event, context):
 
         user_table.update_item(
             Key={"id": user_id},
-            UpdateExpression="SET job_post = if_not_exists(job_post, :job_post)",
+            UpdateExpression="SET job_post = :job_post",
             ExpressionAttributeValues={":job_post": job_post},
         )
         

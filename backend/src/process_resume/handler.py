@@ -10,8 +10,14 @@ def handler(event, context):
     try:
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
-        resume = event["body"]["resume"]
-        semantic_sections = resume_parser(resume)
+        original_resume = event["body"]["resume"]
+        semantic_sections = resume_parser(original_resume)
+
+        user_table.update_item(
+            Key={"id": user_id},
+            UpdateExpression="SET original_resume = :original_resume",
+            ExpressionAttributeValues={":original_resume": original_resume},
+        )
 
         user_table.update_item(
             Key={"id": user_id},

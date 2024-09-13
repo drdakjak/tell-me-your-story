@@ -18,7 +18,7 @@ You are an expert resume writer specializing in tailoring resumes to specific jo
 - Job requirements (required and preferred skills).
 
 **Objective:** 
-USE MAXIMALLY 300 WORDS FOR REVISED SECTION. Use maximally three or less bullet points for each section.
+USE MAXIMALLY 300 WORDS FOR TAILORED SECTION. Use maximally three or less bullet points for each section.
 Include only highligts from each section which are relevant to the job post.
 
 **JOB REQUIREMENTS:**

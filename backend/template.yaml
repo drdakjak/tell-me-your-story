@@ -345,9 +345,13 @@ Resources:
         Variables:
           SESSIONTABLE_TABLE_NAME: !Ref SessionTable
           SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref SessionTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
       Events:
         ApiPOSTinvokechat:
           Type: Api

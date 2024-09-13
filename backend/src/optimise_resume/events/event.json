@@ -1,6 +1,5 @@
 {
-    "body": {
-    },
+    "body": {},
     "requestContext": {
         "authorizer": {
             "claims": {

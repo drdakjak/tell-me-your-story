@@ -1,2 +1,6 @@
 langgraph
+langchain_openai
+langchain_core
+langchain_anthropic
 boto3
+python-dotenv

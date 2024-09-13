@@ -1,9 +1,5 @@
 import logging
 
-from math import log
-from typing import TypedDict, Annotated, List
-from httpx import get
-from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from .state import AgentState
@@ -48,7 +44,7 @@ def adviser_node(state: AgentState):
     return {"advice": advice}
 
 
-def get_revised_section(state: AgentState):
+def get_tailored_section(state: AgentState):
 
     system_promp = RESUME_WRITER.format(
         job_requirements=format_job_requirements(state["job_requirements"]),
@@ -62,14 +58,12 @@ def get_revised_section(state: AgentState):
     ]
     response = MODEL.invoke(messages)
     content = response.content
-    logger.info(content)
-    print(content)
     return content
 
 
 def writer_node(state: AgentState):
-    revised_section = get_revised_section(state)
-    return {"revised_section": revised_section}
+    tailored_section = get_tailored_section(state)
+    return {"tailored_section": tailored_section}
 
 
 def get_feedback(state: AgentState):
