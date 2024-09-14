@@ -3,9 +3,9 @@ langchain_community
 python-dotenv
 langchain_core
 langchain_openai
-webdriver_manager
-selenium-wire
+# webdriver_manager
+# selenium-wire
 beautifulsoup4
 langchain_anthropic
-chromedriver-py
-blinker==1.7.0
+# chromedriver-py
+# blinker==1.7.0

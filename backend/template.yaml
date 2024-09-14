@@ -1,4 +1,10 @@
 Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Repository:
+    Type: String
+    Description: Repository url
+    
 Resources:
   Api:
     Type: AWS::Serverless::Api
@@ -85,7 +91,7 @@ Resources:
     Type: AWS::Amplify::Branch
     Properties:
       BranchName: main
-      AppId: !GetAtt AmplifyApp.AppId
+      AppId: !GetAtt App.AppId
       EnableAutoBuild: true
 
   App:
@@ -368,14 +374,14 @@ Resources:
       UsernameAttributes:
         - email
       AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
+        AllowAdminCreateUserOnly: False
       Policies:
         PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireSymbols: true
-          RequireUppercase: true
+          MinimumLength: 4
+          # RequireLowercase: true
+          # RequireNumbers: true
+          # RequireSymbols: true
+          # RequireUppercase: true
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
