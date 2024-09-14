@@ -377,7 +377,7 @@ Resources:
         AllowAdminCreateUserOnly: False
       Policies:
         PasswordPolicy:
-          MinimumLength: 4
+          MinimumLength: 6
           # RequireLowercase: true
           # RequireNumbers: true
           # RequireSymbols: true
