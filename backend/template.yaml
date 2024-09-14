@@ -6,9 +6,15 @@ Resources:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
         - ResourceName: Api
-      StageName: Prod
+      StageName: dev
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt CognitoUserPool.Arn
       DefinitionBody:
-        openapi: '3.0'
+        openapi: "3.0"
         info: {}
         paths:
           /fetch_job_post:
@@ -70,21 +76,54 @@ Resources:
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       Cors:
-        AllowOrigin: '''"*"'''
-        AllowHeaders: '''"*"'''
-        AllowMethods: '''"*"'''
+        AllowOrigin: "'*'"
+        AllowHeaders: "'*'"
+        AllowMethods: "'*'"
         MaxAge: 5
 
-  # Branch:
-  #   Type: AWS::Amplify::Branch
-  #   Properties:
-  #     AppId: <String>
-  #     BranchName: <String>
+  AmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      BranchName: main
+      AppId: !GetAtt AmplifyApp.AppId
+      EnableAutoBuild: true
 
-  # App:
-  #   Type: AWS::Amplify::App
-  #   Properties:
-  #     Name: <String>
+  App:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+      Repository: !Ref Repository
+      BuildSpec: |
+        version: 1
+        applications:
+          - frontend:
+              phases:
+                preBuild:
+                  commands:
+                    - npm ci
+                build:
+                  commands:
+                    - npm run build
+              artifacts:
+                baseDirectory: dist
+                files:
+                  - '**/*'
+              cache:
+                paths:
+                  - node_modules/**/*
+            appRoot: frontend
+      AccessToken: "{{resolve:secretsmanager:tell-me-your-story-github-token}}"
+      EnvironmentVariables:
+        - Name: AMPLIFY_MONOREPO_APP_ROOT
+          Value: frontend
+        - Name: VITE_REGION
+          Value: !Ref AWS::Region
+        - Name: VITE_API_ENDPOINT
+          Value: !Sub "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
+        - Name: VITE_USER_POOL_ID
+          Value: !Ref CognitoUserPool
+        - Name: VITE_USER_POOL_CLIENT_ID
+          Value: !Ref CognitoUserPoolClient
 
   FetchJobPost:
     Type: AWS::Serverless::Function
@@ -102,7 +141,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Events:
         ApiPOSTFetchJobPost:
           Type: Api
@@ -140,7 +179,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
 
       Policies:
         - DynamoDBCrudPolicy:
@@ -168,7 +207,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Events:
         ApiPOSTuploadresume:
           Type: Api
@@ -206,7 +245,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -240,7 +279,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -267,7 +306,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
           SESSIONTABLE_TABLE_NAME: !Ref SessionTable
           SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
       Events:
@@ -319,15 +358,31 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  UserPool:
+  CognitoUserPool:
     Type: AWS::Cognito::UserPool
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
     Properties:
-      AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: false
-      AliasAttributes:
+      AutoVerifiedAttributes:
         - email
-        - preferred_username
-      UserPoolName: !Sub ${AWS::StackName}-UserPool
+      UsernameAttributes:
+        - email
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      ClientName: !Ref CognitoUserPool
+      GenerateSecret: false
 
   InvokeChat:
     Type: AWS::Serverless::Function
@@ -412,3 +467,11 @@ Metadata:
         - ChatResume
         - ResetChat
         - InvokeChat
+
+Outputs:
+  CognitoUserPool:
+    Value: !Ref CognitoUserPool
+  CognitoUserPoolClient:
+    Value: !Ref CognitoUserPoolClient
+  ApiGatewayBaseUrl:
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
