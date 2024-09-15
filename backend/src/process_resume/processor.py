@@ -11,8 +11,8 @@ from clients import get_model
 
 
 class SemanticSection(BaseModel):
-    title: str = Field(description="Title of the section")
-    content: str = Field(description="Content of the section")
+    header: str = Field(description="Header of the section in Markdown format")
+    content: str = Field(description="Content of the section in Markdown format")
 
 
 class Sections(BaseModel):

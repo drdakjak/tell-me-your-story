@@ -33,16 +33,21 @@ def init_message_history(message_history, original_section, job_requirements):
     system_message = SystemMessage(content=system_prompt)
     message_history.add_message(system_message)
 
+
 def filter_messages(messages):
-    return [msg for msg in messages if msg.type in {'human', 'ai'}]
+    return [msg for msg in messages if msg.type in {"human", "ai"}]
+
+
 def format_messages(messages):
     return [{"type": msg.type, "content": msg.content} for msg in messages]
 
 
 def handler(event, context):
     try:
-        conversation_id = event["body"]["conversation_id"]
-        original_section = event["body"]["original_section"]
+        body = json.loads(event["body"])
+
+        conversation_id = body["conversationId"]
+        original_section = body["originalSection"]
 
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
         response = user_table.get_item(Key={"id": user_id})
@@ -51,12 +56,25 @@ def handler(event, context):
         message_history = get_message_history(conversation_id)
         if len(message_history.messages) == 0:
             init_message_history(message_history, original_section, job_requirements)
-            
+
         filtered_messages = filter_messages(message_history.messages)
         formated_filtered_messages = format_messages(filtered_messages)
         return {
             "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
             "body": json.dumps(formated_filtered_messages),
         }
     except Exception as e:
-        return {"statusCode": 500, "body": json.dumps(e.__repr__())}
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
+            "body": json.dumps(e.__repr__()),
+        }

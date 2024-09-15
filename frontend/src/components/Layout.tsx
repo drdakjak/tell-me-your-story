@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import TextDiffComponent from './TextDiff';
 import JobPostProcessor from './JobPostProcessor';
+import ResumeProcessor from './ResumeProcessor';
+import Editor from './Editor';
+
+
 
 const user = {
   name: 'Tom Cook',
@@ -11,17 +14,14 @@ const user = {
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
 const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  { name: 'Projects', href: '#', current: false },
-  { name: 'Calendar', href: '#', current: false },
-  { name: 'Reports', href: '#', current: false },
-  { name: 'Job Post', href: '#', current: false },
+  { name: 'Job Post', href: '#', current: true },
+  { name: 'Resume', href: '#', current: false },
+  { name: 'Editor', href: '#', current: false },
 ]
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your Profile', action: '#' },
+  { name: 'Settings', action: '#' },
+  { name: 'Sign out', action: '#' },
 ]
 
 function classNames(...classes: string[]) {
@@ -106,8 +106,8 @@ University of Technology | Graduated: May 2015
 - AWS Certified Solutions Architect
 - Certified Scrum Master`;
 
-export default function Layout() {
-  const [currentPage, setCurrentPage] = useState('Dashboard');
+export default function Layout({ signOut }) {
+  const [currentPage, setCurrentPage] = useState('Job Post');
 
   const handleNavigation = (pageName: string) => {
     setCurrentPage(pageName);
@@ -171,18 +171,16 @@ export default function Layout() {
                     </div>
                     <MenuItems
                       transition
-                      className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                      className="absolute flex right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                     >
-                      {userNavigation.map((item) => (
-                        <MenuItem key={item.name}>
-                          <a
-                            href={item.href}
-                            className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
-                          >
-                            {item.name}
-                          </a>
-                        </MenuItem>
-                      ))}
+                      <MenuItem key='Sign out'>
+                        <button
+                          onClick={signOut}
+                          className="grow px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
+                        >
+                          Sign out
+                        </button>
+                      </MenuItem>
                     </MenuItems>
                   </Menu>
                 </div>
@@ -235,12 +233,13 @@ export default function Layout() {
                   <BellIcon aria-hidden="true" className="h-6 w-6" />
                 </button>
               </div>
+              {/* TODO FIX navigation */}
               <div className="mt-3 space-y-1 px-2">
                 {userNavigation.map((item) => (
                   <DisclosureButton
                     key={item.name}
                     as="a"
-                    href={item.href}
+                    href={item.action}
                     className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                   >
                     {item.name}
@@ -251,19 +250,20 @@ export default function Layout() {
           </DisclosurePanel>
         </Disclosure>
 
+        {/* Page header */}
         <header className="bg-white shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">{currentPage}</h1>
           </div>
         </header>
+
         <main>
+          {/* Page routing and content */}
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {currentPage === 'Dashboard' && (
-              <div className="container mx-auto px-4 py-8">
-                <TextDiffComponent originalText={originalText} modifiedText={modifiedText} />
-              </div>
-            )}
+            {currentPage === 'Editor' && <Editor />}
             {currentPage === 'Job Post' && <JobPostProcessor />}
+            {currentPage === 'Resume' && <ResumeProcessor />}
+
           </div>
         </main>
       </div>

@@ -8,9 +8,10 @@ user_table = get_user_table()
 
 def handler(event, context):
     try:
+        body = json.loads(event["body"])
+        original_resume = body["resume"]
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
-        original_resume = event["body"]["resume"]
         semantic_sections = resume_parser(original_resume)
 
         user_table.update_item(
@@ -25,6 +26,22 @@ def handler(event, context):
             ExpressionAttributeValues={":semantic_sections": semantic_sections},
         )
 
-        return {"statusCode": 200, "body": json.dumps(semantic_sections)}
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
+            "body": json.dumps(semantic_sections),
+        }
     except Exception as e:
-        return {"statusCode": 400, "body": json.dumps(e.__repr__())}
+        return {
+            "statusCode": 400,
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
+            "body": json.dumps(e.__repr__()),
+        }

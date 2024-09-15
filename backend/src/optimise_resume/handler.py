@@ -6,6 +6,7 @@ from clients import get_user_table
 
 user_table = get_user_table()
 
+
 def process_resume_section(resume_section, workflow, job_requirements, original_resume):
     keys_to_include = ["advice", "tailored_section"]
     if resume_section["content"]:
@@ -18,10 +19,7 @@ def process_resume_section(resume_section, workflow, job_requirements, original_
         )
         tailored_section = {key: final_state[key] for key in keys_to_include}
     else:
-        tailored_section = {
-            "advice": "",
-            "tailored_section": resume_section
-        }
+        tailored_section = {"advice": "", "tailored_section": resume_section}
 
     return tailored_section
 
@@ -35,7 +33,7 @@ def get_tailored_resume(semantic_sections, job_requirements, original_resume):
             semantic_sections,
             [workflow] * len(semantic_sections),
             [job_requirements] * len(semantic_sections),
-            [original_resume] * len(semantic_sections)
+            [original_resume] * len(semantic_sections),
         )
 
     tailored_resume = list(tailored_resume)
@@ -51,20 +49,35 @@ def handler(event, context):
         original_resume = response["Item"]["original_resume"]
         semantic_sections = response["Item"]["semantic_sections"]
 
-        tailored_resume = get_tailored_resume(
+        tailored_sections = get_tailored_resume(
             semantic_sections, job_requirements, original_resume
         )
         user_table.update_item(
             Key={"id": user_id},
-            UpdateExpression="SET tailored_resume = :tailored_resume",
-            ExpressionAttributeValues={":tailored_resume": tailored_resume},
+            UpdateExpression="SET tailored_sections = :tailored_sections",
+            ExpressionAttributeValues={":tailored_sections": tailored_sections},
         )
+
+        body = {
+            "semantic_sections": semantic_sections,
+            "tailored_sections": tailored_sections,
+        }
         return {
             "statusCode": 200,
-            "body": json.dumps(tailored_resume),
+            "body": json.dumps(body),
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
         }
     except Exception as e:
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)}),
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
         }

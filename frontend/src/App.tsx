@@ -2,8 +2,9 @@ import React from 'react';
 import './App.css';
 import Layout from './components/Layout';
 import { Amplify } from 'aws-amplify';
+import { fetchAuthSession } from "aws-amplify/auth";
 import { withAuthenticator, Button, Heading } from '@aws-amplify/ui-react';
-
+import "@aws-amplify/ui-react/styles.css";
 
 Amplify.configure({
   Auth: {
@@ -19,29 +20,33 @@ Amplify.configure({
         region: import.meta.env.VITE_API_REGION,
       },
     },
-  }}, {
+  }
+}, {
   API: {
     REST: {
       headers: async () => {
         const tokens = (await fetchAuthSession()).tokens;
         const jwt = tokens?.idToken?.toString();
-          return {
-            "authorization": `Bearer ${jwt}`
-          };
+        return {
+          "authorization": `Bearer ${jwt}`
+        };
       }
     }
   }
 });
 const App: React.FC = ({ signOut }) => {
-  return (
-    // <div className="App">
-    //   <Layout />
-    // </div>
+  console.log(import.meta.env.VITE_USER_POOL_ID);
+  console.log(import.meta.env.VITE_USER_POOL_CLIENT_ID);
+  console.log(import.meta.env.VITE_API_ENDPOINT);
+  console.log(import.meta.env.VITE_API_REGION);
 
+  return (
     <div>
-      <h1>Thankyou for doing verification</h1>
-      <h2>My Content</h2>
-      <button onClick={signOut}>Sign out</button>
+      <div className="App">
+        <Layout
+          signOut={signOut}
+        />
+      </div>
     </div>
 
   );

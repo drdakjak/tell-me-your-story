@@ -3,35 +3,42 @@ import { diff_match_patch } from 'diff-match-patch';
 import ReactMarkdown from 'react-markdown';
 import DiffSection from './DiffSection';
 
-interface TextDiffProps {
-  originalText: string;
-  modifiedText: string;
-}
-
 interface Section {
   header: string;
   content: string;
 }
 
-const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
-  const [currentText, setCurrentText] = useState(originalText);
+interface TailoredSection {
+  advice: string;
+  tailored_section: Section;
+}
+interface TextDiffProps {
+  originalSections: Section[];
+  tailoredSections: TailoredSection[];
+}
+
+
+
+const TextDiff: React.FC<TextDiffProps> = ({ originalSections, tailoredSections }) => {
+  // const [currentText, setCurrentText] = useState(originalText);
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
   const dmp = new diff_match_patch();
-
+  console.log(originalSections);
+  console.log(tailoredSections);
   useEffect(() => {
-    const originalSections = splitIntoSections(originalText);
-    const modifiedSections = splitIntoSections(modifiedText);
-
     const newSections = originalSections.map((originalSection, index) => {
-      const modifiedSection = modifiedSections[index] || { header: '', content: '' };
-      const diffs = dmp.diff_main(originalSection.content, modifiedSection.content);
+      const tailoredSection = tailoredSections[index].tailored_section || { header: '', content: '' };
+      console.log(originalSection);
+      console.log(tailoredSection);
+
+      const diffs = dmp.diff_main(originalSection.content, tailoredSection.content);
       dmp.diff_cleanupSemantic(diffs);
 
       return {
         header: originalSection.header,
         originalContent: originalSection.content,
-        modifiedContent: modifiedSection.content,
+        modifiedContent: tailoredSection.content,
         diffs,
         hasChanges: diffs.some(([type]) => type !== 0),
         isAccepted: false,
@@ -40,7 +47,7 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
     });
 
     setSections(newSections);
-  }, [originalText, modifiedText]);
+  }, [originalSections, tailoredSections]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -51,36 +58,13 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const splitIntoSections = (text: string): Section[] => {
-    const lines = text.split('\n');
-    const sections: Section[] = [];
-    let currentSection: Section = { header: '', content: '' };
-
-    lines.forEach((line) => {
-      if (line.startsWith('#')) {
-        if (currentSection.header) {
-          sections.push(currentSection);
-        }
-        currentSection = { header: line, content: '' };
-      } else {
-        currentSection.content += line + '\n';
-      }
-    });
-
-    if (currentSection.header) {
-      sections.push(currentSection);
-    }
-
-    return sections;
-  };
-
   const handleAcceptSection = (index: number) => {
     const newSections = [...sections];
     newSections[index].isAccepted = true;
     newSections[index].isRejected = false;
     setSections(newSections);
 
-    updateCurrentText(index, newSections[index].modifiedContent);
+    // updateCurrentText(index, newSections[index].modifiedContent);
   };
 
   const handleRejectSection = (index: number) => {
@@ -89,16 +73,16 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
     newSections[index].isAccepted = false;
     setSections(newSections);
 
-    updateCurrentText(index, newSections[index].originalContent);
+    // updateCurrentText(index, newSections[index].originalContent);
   };
 
-  const updateCurrentText = (index: number, newContent: string) => {
-    const newText = currentText.split('\n');
-    const sectionStart = newText.findIndex((line) => line === sections[index].header);
-    const sectionEnd = sectionStart + sections[index].originalContent.split('\n').length;
-    newText.splice(sectionStart + 1, sectionEnd - sectionStart - 1, ...newContent.trim().split('\n'));
-    setCurrentText(newText.join('\n'));
-  };
+  // const updateCurrentText = (index: number, newContent: string) => {
+  //   const newText = currentText.split('\n');
+  //   const sectionStart = newText.findIndex((line) => line === sections[index].header);
+  //   const sectionEnd = sectionStart + sections[index].originalContent.split('\n').length;
+  //   newText.splice(sectionStart + 1, sectionEnd - sectionStart - 1, ...newContent.trim().split('\n'));
+  //   setCurrentText(newText.join('\n'));
+  // };
 
   const handleOriginalContentChange = (index: number, newContent: string) => {
     const newSections = [...sections];
@@ -109,7 +93,7 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
     newSections[index].hasChanges = diffs.some(([type]) => type !== 0);
     setSections(newSections);
 
-    updateCurrentText(index, newContent);
+    // updateCurrentText(index, newContent);
   };
 
   return (
@@ -145,10 +129,10 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalText, modifiedText }) => {
           </div>
         ))}
       </div>
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <div className="font-bold">Current Text:</div>
         <ReactMarkdown>{currentText}</ReactMarkdown>
-      </div>
+      </div> */}
     </div>
   );
 };

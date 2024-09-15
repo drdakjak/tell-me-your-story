@@ -20,7 +20,7 @@ def format_job_requirements(job_requirements) -> str:
 
 def format_section(section) -> str:
     section_formatted = (
-        f"\nSection:\n\nTitle:\n{section['title']}\n\nContent:\n{section['content']}\n"
+        f"\nSection:\n\Header:\n{section['header']}\n\nContent:\n{section['content']}\n"
     )
     return section_formatted
 
@@ -53,17 +53,17 @@ def adviser_node(state: AgentState):
 
 
 class TailoredSection(TypedDict):
-    """The section with the tailored title and content"""
+    """The section with the tailored header and content"""
 
-    title: Annotated[
+    header: Annotated[
         str,
         ...,
-        "The tailored section's title",
+        "The tailored section's header",
     ]
     content: Annotated[
         str,
         ...,
-        "The tailored section's content only that does not contains the title of the section",
+        "The tailored section's content only that does not contains the header of the section",
     ]
 
 

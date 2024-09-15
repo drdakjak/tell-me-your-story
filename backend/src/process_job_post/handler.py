@@ -8,9 +8,10 @@ user_table = get_user_table()
 
 def handler(event, context):
     try:
+        body = json.loads(event["body"])
+        job_post = body["jobPost"]
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
-        job_post = event["body"]["job_post"]
 
         user_table.update_item(
             Key={"id": user_id},
@@ -29,10 +30,20 @@ def handler(event, context):
         
         return {
             'statusCode': 200,
-            'body': json.dumps(job_requirements)
+            'body': json.dumps(job_requirements),
+            'headers': {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            }
         }
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps(e.__repr__())
+            'body': json.dumps(e.__repr__()),
+            'headers': {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            }
         }
