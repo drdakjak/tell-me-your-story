@@ -16,6 +16,14 @@ interface Message {
   content: string;
 }
 
+const WritingAnimation: React.FC = () => (
+  <div className="flex items-center space-x-1">
+    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+  </div>
+);
+
 const ChatWindow: React.FC<ChatWindowProps> = ({
   sectionHeader,
   sectionContent,
@@ -27,6 +35,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [isWaiting, setIsWaiting] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,8 +51,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+  const formatAIResponse = ( content ) => {
+    let message = content.response;
+    if (content.tailored_section) {
+      message += "\n\n";
+      message += content.tailored_section;
+    }
+    return message;
+  };
 
   const invokeChat = async () => {
+    setIsWaiting(true);
     try {
       const { body } = await post({
         apiName: 'Api',
@@ -56,25 +74,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         }
       }).response;
       const response = await body.json();
-      console.log("invoke chat response");
-      console.log(response);
       response.map((message: any) => {
         if (message.type === 'ai' && message.content) {
-          message.content = JSON.parse(message.content).response;
+          const content = JSON.parse(message.content)
+          message.content = formatAIResponse(content);
         } else {
           message.content = message.content;
         }
       });
 
-      console.log("invoke chat response");
-      console.log(response);
       setMessages(response);
     } catch (error) {
       console.error('Error invoking chat:', error);
+    } finally {
+      setIsWaiting(false);
     }
   };
 
   const resetChat = async () => {
+    setIsWaiting(true);
     try {
       await post({
         apiName: 'Api',
@@ -89,6 +107,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       invokeChat();
     } catch (error) {
       console.error('Error resetting chat:', error);
+      setIsWaiting(false);
     }
   };
 
@@ -97,6 +116,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       const newMessage: Message = { type: 'human', content: inputMessage };
       setMessages([...messages, newMessage]);
       setInputMessage('');
+      setIsWaiting(true);
 
       try {
         const { body } = await post({
@@ -111,11 +131,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           }
         }).response;
         const response = await body.json();
-        console.log("chat resume response");
-        console.log(response);
+
         const botResponse: Message = {
           type: 'ai',
-          content: response.response
+          content: formatAIResponse(response)
         };
         setMessages(prevMessages => [...prevMessages, botResponse]);
 
@@ -129,6 +148,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           content: "Sorry, there was an error processing your message. Please try again."
         };
         setMessages(prevMessages => [...prevMessages, errorMessage]);
+      } finally {
+        setIsWaiting(false);
       }
     }
   };
@@ -169,6 +190,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
               </span>
             </div>
           ))}
+          {isWaiting && (
+            <div className="text-left mb-2">
+              <span className="inline-block p-2 rounded-lg bg-gray-300">
+                <WritingAnimation />
+              </span>
+            </div>
+          )}
           <div ref={chatEndRef} />
         </div>
         <div className="flex">
@@ -177,12 +205,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            className="flex-grow border rounded-l-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-grow border rounded-l-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="Type your message..."
+            disabled={isWaiting}
           />
           <button
             onClick={handleSendMessage}
-            className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isWaiting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isWaiting}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />

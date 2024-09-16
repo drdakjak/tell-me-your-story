@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { diff_match_patch } from 'diff-match-patch';
 import ReactMarkdown from 'react-markdown';
 import DiffSection from './DiffSection';
+import AdvicePopup from './AdvicePopup';
+import { FaLightbulb } from 'react-icons/fa';
 
 interface Section {
   header: string;
@@ -14,19 +16,20 @@ interface TailoredSection {
   tailored_section: Section;
 }
 
-interface TextDiffProps {
+interface RenderProps {
   originalSections: Section[];
   tailoredSections: TailoredSection[];
   onUpdateTailoredContent: (index: number, newContent: string) => void;
 }
 
-const TextDiff: React.FC<TextDiffProps> = ({ 
+const Render: React.FC<RenderProps> = ({ 
   originalSections, 
   tailoredSections, 
   onUpdateTailoredContent 
 }) => {
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
+  const [showAdvicePopup, setShowAdvicePopup] = useState<number | null>(null);
   const dmp = new diff_match_patch();
 
   useEffect(() => {
@@ -43,7 +46,6 @@ const TextDiff: React.FC<TextDiffProps> = ({
         tailoredHeader: tailoredSection.header,
         tailoredContent: tailoredSection.content,
         conversationId: originalSection.section_id,
-
         diffs,
         isEditing: false,
       };
@@ -78,10 +80,13 @@ const TextDiff: React.FC<TextDiffProps> = ({
     onUpdateTailoredContent(index, newContent);
   };
 
+  const openAdvicePopup = (index: number) => {
+    setShowAdvicePopup(index);
+  };
+
   return (
     <div className="p-4 border rounded shadow-lg bg-gray-100">
       <div className="mb-4 flex justify-between items-center">
-        <div className="text-lg font-bold">CV Text Diff</div>
         <button
           onClick={() => setIsDesktopView(!isDesktopView)}
           className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none"
@@ -108,6 +113,13 @@ const TextDiff: React.FC<TextDiffProps> = ({
               <div className="w-full p-2 border rounded bg-white whitespace-pre-wrap">
                 <ReactMarkdown>{section.originalContent}</ReactMarkdown>
               </div>
+              <button
+                onClick={() => openAdvicePopup(index)}
+                className="p-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold rounded-full"
+                title="Advice"
+              >
+                <FaLightbulb className="h-5 w-5" /> 
+              </button>
             </div>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
               <DiffSection
@@ -121,8 +133,15 @@ const TextDiff: React.FC<TextDiffProps> = ({
           </div>
         ))}
       </div>
+      {showAdvicePopup !== null && (
+        <AdvicePopup
+          advice={sections[showAdvicePopup].advice}
+          header={sections[showAdvicePopup].tailoredHeader}
+          onClose={() => setShowAdvicePopup(null)}
+        />
+      )}
     </div>
   );
 };
 
-export default TextDiff;
+export default Render;
