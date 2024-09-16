@@ -6,46 +6,49 @@ import DiffSection from './DiffSection';
 interface Section {
   header: string;
   content: string;
+  section_id: string;
 }
 
 interface TailoredSection {
   advice: string;
   tailored_section: Section;
 }
+
 interface TextDiffProps {
   originalSections: Section[];
   tailoredSections: TailoredSection[];
+  onUpdateTailoredContent: (index: number, newContent: string) => void;
 }
 
-
-
-const TextDiff: React.FC<TextDiffProps> = ({ originalSections, tailoredSections }) => {
-  // const [currentText, setCurrentText] = useState(originalText);
+const TextDiff: React.FC<TextDiffProps> = ({ 
+  originalSections, 
+  tailoredSections, 
+  onUpdateTailoredContent 
+}) => {
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
   const dmp = new diff_match_patch();
-  console.log(originalSections);
-  console.log(tailoredSections);
+
   useEffect(() => {
     const newSections = originalSections.map((originalSection, index) => {
+      const advice = tailoredSections[index].advice;
       const tailoredSection = tailoredSections[index].tailored_section || { header: '', content: '' };
-      console.log(originalSection);
-      console.log(tailoredSection);
-
       const diffs = dmp.diff_main(originalSection.content, tailoredSection.content);
       dmp.diff_cleanupSemantic(diffs);
 
       return {
-        header: originalSection.header,
+        originalHeader: originalSection.header,
         originalContent: originalSection.content,
-        modifiedContent: tailoredSection.content,
+        advice: advice,
+        tailoredHeader: tailoredSection.header,
+        tailoredContent: tailoredSection.content,
+        conversationId: originalSection.section_id,
+
         diffs,
-        hasChanges: diffs.some(([type]) => type !== 0),
-        isAccepted: false,
-        isRejected: false,
+        isEditing: false,
       };
     });
-
+    console.log(newSections);
     setSections(newSections);
   }, [originalSections, tailoredSections]);
 
@@ -58,42 +61,21 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalSections, tailoredSections 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleAcceptSection = (index: number) => {
+  const handleEdit = (index: number) => {
     const newSections = [...sections];
-    newSections[index].isAccepted = true;
-    newSections[index].isRejected = false;
+    newSections[index].isEditing = true;
     setSections(newSections);
-
-    // updateCurrentText(index, newSections[index].modifiedContent);
   };
 
-  const handleRejectSection = (index: number) => {
+  const handleSave = (index: number, newHeader: string, newContent: string) => {
     const newSections = [...sections];
-    newSections[index].isRejected = true;
-    newSections[index].isAccepted = false;
+    newSections[index].tailoredHeader = newHeader;
+    newSections[index].tailoredContent = newContent;
+    newSections[index].isEditing = false;
+    newSections[index].diffs = dmp.diff_main(newSections[index].originalContent, newContent);
+    dmp.diff_cleanupSemantic(newSections[index].diffs);
     setSections(newSections);
-
-    // updateCurrentText(index, newSections[index].originalContent);
-  };
-
-  // const updateCurrentText = (index: number, newContent: string) => {
-  //   const newText = currentText.split('\n');
-  //   const sectionStart = newText.findIndex((line) => line === sections[index].header);
-  //   const sectionEnd = sectionStart + sections[index].originalContent.split('\n').length;
-  //   newText.splice(sectionStart + 1, sectionEnd - sectionStart - 1, ...newContent.trim().split('\n'));
-  //   setCurrentText(newText.join('\n'));
-  // };
-
-  const handleOriginalContentChange = (index: number, newContent: string) => {
-    const newSections = [...sections];
-    newSections[index].originalContent = newContent;
-    const diffs = dmp.diff_main(newContent, newSections[index].modifiedContent);
-    dmp.diff_cleanupSemantic(diffs);
-    newSections[index].diffs = diffs;
-    newSections[index].hasChanges = diffs.some(([type]) => type !== 0);
-    setSections(newSections);
-
-    // updateCurrentText(index, newContent);
+    onUpdateTailoredContent(index, newContent);
   };
 
   return (
@@ -102,37 +84,43 @@ const TextDiff: React.FC<TextDiffProps> = ({ originalSections, tailoredSections 
         <div className="text-lg font-bold">CV Text Diff</div>
         <button
           onClick={() => setIsDesktopView(!isDesktopView)}
-          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none"
+          title={`Switch to ${isDesktopView ? 'Mobile' : 'Desktop'} View`}
         >
-          Switch to {isDesktopView ? 'Mobile' : 'Desktop'} View
+          {isDesktopView ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM8 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H9a1 1 0 01-1-1V4zM15 3a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2z" />
+            </svg>
+          )}
         </button>
       </div>
       <div className={`mb-4 font-mono text-sm ${isDesktopView ? 'md:flex flex-col' : ''}`}>
         {sections.map((section, index) => (
           <div key={index} className={`mb-4 ${isDesktopView ? 'md:flex' : ''}`}>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
-              <h3 className="text-md font-semibold mb-2">{section.header}</h3>
-              <textarea
-                value={section.originalContent}
-                onChange={(e) => handleOriginalContentChange(index, e.target.value)}
-                className="w-full h-48 p-2 border rounded resize-none"
-              />
+              <h3 className="text-md font-semibold mb-2">
+                <ReactMarkdown>{section.originalHeader}</ReactMarkdown>
+              </h3>
+              <div className="w-full p-2 border rounded bg-white whitespace-pre-wrap">
+                <ReactMarkdown>{section.originalContent}</ReactMarkdown>
+              </div>
             </div>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
               <DiffSection
                 section={section}
                 index={index}
-                onAccept={handleAcceptSection}
-                onReject={handleRejectSection}
+                onEdit={handleEdit}
+                onSave={handleSave}
+                onUpdateTailoredContent={(content: string) => onUpdateTailoredContent(index, content)}
               />
             </div>
           </div>
         ))}
       </div>
-      {/* <div className="mt-4">
-        <div className="font-bold">Current Text:</div>
-        <ReactMarkdown>{currentText}</ReactMarkdown>
-      </div> */}
     </div>
   );
 };

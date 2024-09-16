@@ -1,35 +1,135 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { post } from 'aws-amplify/api';
 
 interface ChatWindowProps {
   sectionHeader: string;
   sectionContent: string;
   isOpen: boolean;
   onClose: () => void;
+  conversationId: string;
+  onUpdateTailoredContent: (content: string) => void;
 }
 
 interface Message {
-  text: string;
-  isUser: boolean;
+  type: 'human' | 'ai';
+  content: string;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ sectionHeader, sectionContent, isOpen, onClose }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({
+  sectionHeader,
+  sectionContent,
+  isOpen,
+  onClose,
+  conversationId,
+  onUpdateTailoredContent
+}) => {
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    if (isOpen) {
+      invokeChat();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const invokeChat = async () => {
+    try {
+      const { body } = await post({
+        apiName: 'Api',
+        path: '/invoke_chat',
+        options: {
+          body: {
+            conversationId,
+            originalSection: sectionContent
+          }
+        }
+      }).response;
+      const response = await body.json();
+      console.log("invoke chat response");
+      console.log(response);
+      response.map((message: any) => {
+        if (message.type === 'ai' && message.content) {
+          message.content = JSON.parse(message.content).response;
+        } else {
+          message.content = message.content;
+        }
+      });
+
+      console.log("invoke chat response");
+      console.log(response);
+      setMessages(response);
+    } catch (error) {
+      console.error('Error invoking chat:', error);
+    }
+  };
+
+  const resetChat = async () => {
+    try {
+      await post({
+        apiName: 'Api',
+        path: '/reset_chat',
+        options: {
+          body: {
+            conversationId,
+          }
+        }
+      }).response;
+
+      invokeChat();
+    } catch (error) {
+      console.error('Error resetting chat:', error);
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (inputMessage.trim() !== '') {
-      const newMessage: Message = { text: inputMessage, isUser: true };
+      const newMessage: Message = { type: 'human', content: inputMessage };
       setMessages([...messages, newMessage]);
       setInputMessage('');
-      
-      // Simulated response (replace with actual API call in a real application)
-      setTimeout(() => {
-        const botResponse: Message = { 
-          text: "Thank you for your message. How can I assist you with this section?", 
-          isUser: false 
+
+      try {
+        const { body } = await post({
+          apiName: 'Api',
+          path: '/chat_resume',
+          options: {
+            body: {
+              conversationId,
+              message: inputMessage,
+              tailoredSection: sectionContent
+            }
+          }
+        }).response;
+        const response = await body.json();
+        console.log("chat resume response");
+        console.log(response);
+        const botResponse: Message = {
+          type: 'ai',
+          content: response.response
         };
         setMessages(prevMessages => [...prevMessages, botResponse]);
-      }, 1000);
+
+        if (response.tailored_section) {
+          onUpdateTailoredContent(response.tailored_section);
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        const errorMessage: Message = {
+          type: 'ai',
+          content: "Sorry, there was an error processing your message. Please try again."
+        };
+        setMessages(prevMessages => [...prevMessages, errorMessage]);
+      }
     }
   };
 
@@ -38,40 +138,57 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ sectionHeader, sectionContent, 
   }
 
   return (
-    <div className="mt-4 border rounded-lg shadow-md p-4 bg-white relative">
-      <button
-        onClick={onClose}
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h3 className="text-lg font-semibold mb-2">Chat about: {sectionHeader}</h3>
-      <div className="h-48 overflow-y-auto mb-4 p-2 bg-gray-100 rounded">
-        {messages.map((message, index) => (
-          <div key={index} className={`mb-2 ${message.isUser ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block p-2 rounded-lg ${message.isUser ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}>
-              {message.text}
-            </span>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-md p-4 w-3/4 max-w-2xl">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Chat about: {sectionHeader}</h3>
+          <div>
+            <button
+              onClick={resetChat}
+              className="text-blue-500 hover:text-blue-700 focus:outline-none mr-4"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-        ))}
-      </div>
-      <div className="flex">
-        <input
-          type="text"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          className="flex-grow border rounded-l-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Type your message..."
-        />
-        <button
-          onClick={handleSendMessage}
-          className="bg-blue-500 text-white px-4 py-1 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Send
-        </button>
+        </div>
+        <div className="h-64 overflow-y-auto mb-4 p-2 bg-gray-100 rounded">
+          {messages.map((message, index) => (
+            <div key={index} className={`mb-2 ${message.type === 'human' ? 'text-right' : 'text-left'}`}>
+              <span className={`inline-block p-2 rounded-lg ${message.type === 'human' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}>
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </span>
+            </div>
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+        <div className="flex">
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            className="flex-grow border rounded-l-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Type your message..."
+          />
+          <button
+            onClick={handleSendMessage}
+            className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
