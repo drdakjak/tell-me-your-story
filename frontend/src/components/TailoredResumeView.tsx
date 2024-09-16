@@ -2,11 +2,17 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface TailoredResumeViewProps {
-  tailoredResume: string;
+  tailoredSections: any[];
   onClose: () => void;
 }
+const generateTailoredResume = ( tailoredSections ) => {
+  return tailoredSections.map(section => `## ${section.tailored_section.header}\n\n${section.tailored_section.content}`).join('\n\n');
+};
 
-const TailoredResumeView: React.FC<TailoredResumeViewProps> = ({ tailoredResume, onClose }) => {
+const TailoredResumeView: React.FC<TailoredResumeViewProps> = ({ tailoredSections, onClose }) => {
+  
+
+  const tailoredResume = generateTailoredResume(tailoredSections)
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg max-w-2xl max-h-[80vh] overflow-auto relative">

@@ -35,11 +35,6 @@ Amplify.configure({
   }
 });
 const App: React.FC = ({ signOut }) => {
-  console.log(import.meta.env.VITE_USER_POOL_ID);
-  console.log(import.meta.env.VITE_USER_POOL_CLIENT_ID);
-  console.log(import.meta.env.VITE_API_ENDPOINT);
-  console.log(import.meta.env.VITE_API_REGION);
-
   return (
     <div>
       <div className="App">

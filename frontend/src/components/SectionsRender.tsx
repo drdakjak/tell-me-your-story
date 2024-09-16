@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { diff_match_patch } from 'diff-match-patch';
 import ReactMarkdown from 'react-markdown';
-import DiffSection from './DiffSection';
+import Section from './Section';
 import AdvicePopup from './AdvicePopup';
 import { FaLightbulb } from 'react-icons/fa';
 
-interface Section {
+interface OriginalSection {
   header: string;
   content: string;
   section_id: string;
@@ -13,32 +12,27 @@ interface Section {
 
 interface TailoredSection {
   advice: string;
-  tailored_section: Section;
+  tailored_section: OriginalSection;
 }
 
 interface RenderProps {
-  originalSections: Section[];
+  originalSections: OriginalSection[];
   tailoredSections: TailoredSection[];
-  onUpdateTailoredContent: (index: number, newContent: string) => void;
 }
 
 const Render: React.FC<RenderProps> = ({ 
   originalSections, 
   tailoredSections, 
-  onUpdateTailoredContent 
 }) => {
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
   const [showAdvicePopup, setShowAdvicePopup] = useState<number | null>(null);
-  const [editingSectionIndex, setEditingSectionIndex] = useState<number | null>(null);
-  const dmp = new diff_match_patch();
 
   useEffect(() => {
     const newSections = originalSections.map((originalSection, index) => {
       const advice = tailoredSections[index].advice;
       const tailoredSection = tailoredSections[index].tailored_section || { header: '', content: '' };
-      const diffs = dmp.diff_main(originalSection.content, tailoredSection.content);
-      dmp.diff_cleanupSemantic(diffs);
+   
 
       return {
         originalHeader: originalSection.header,
@@ -47,8 +41,6 @@ const Render: React.FC<RenderProps> = ({
         tailoredHeader: tailoredSection.header,
         tailoredContent: tailoredSection.content,
         conversationId: originalSection.section_id,
-        diffs,
-        isEditing: false,
       };
     });
     setSections(newSections);
@@ -63,35 +55,16 @@ const Render: React.FC<RenderProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleEdit = (index: number) => {
-    setEditingSectionIndex(index);
-    const newSections = [...sections];
-    newSections[index].isEditing = true;
-    setSections(newSections);
-  };
-
-  const handleSave = (index: number, newHeader: string, newContent: string) => {
-    const newSections = [...sections];
-    newSections[index].tailoredHeader = newHeader;
-    newSections[index].tailoredContent = newContent;
-    newSections[index].isEditing = false;
-    newSections[index].diffs = dmp.diff_main(newSections[index].originalContent, newContent);
-    dmp.diff_cleanupSemantic(newSections[index].diffs);
-    setSections(newSections);
-    onUpdateTailoredContent(index, newContent);
-    setEditingSectionIndex(null);
-  };
-
   const openAdvicePopup = (index: number) => {
     setShowAdvicePopup(index);
   };
 
   return (
     <div className="p-4 border rounded shadow-lg bg-gray-100">
-      <div className="mb-4 flex justify-between items-center">
+      <div className="relative mb-4 flex justify-between items-center">
         <button
           onClick={() => setIsDesktopView(!isDesktopView)}
-          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none"
+          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none absolute bottom-0 right-0"
           title={`Switch to ${isDesktopView ? 'Mobile' : 'Desktop'} View`}
         >
           {isDesktopView ? (
@@ -124,20 +97,8 @@ const Render: React.FC<RenderProps> = ({
               </button>
             </div>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
-              <DiffSection
+              <Section
                 section={section}
-                index={index}
-                onEdit={handleEdit}
-                onSave={handleSave}
-                onUpdateTailoredContent={(content: string) => onUpdateTailoredContent(index, content)}
-                isEditing={editingSectionIndex === index}
-                setIsEditing={(isEditing: boolean) => {
-                  if (isEditing) {
-                    setEditingSectionIndex(index);
-                  } else {
-                    setEditingSectionIndex(null);
-                  }
-                }}
               />
             </div>
           </div>

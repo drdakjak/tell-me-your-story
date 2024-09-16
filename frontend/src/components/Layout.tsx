@@ -3,6 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import JobPostProcessor from './JobPostProcessor';
 import ResumeProcessor from './ResumeProcessor';
+import TailoredResume from './TailoredResume';
 import Editor from './Editor';
 
 
@@ -17,6 +18,8 @@ const navigation = [
   { name: 'Job Post', href: '#', current: true },
   { name: 'Resume', href: '#', current: false },
   { name: 'Editor', href: '#', current: false },
+  { name: 'Tailored Resume', href: '#', current: false },
+
 ]
 const userNavigation = [
   { name: 'Your Profile', action: '#' },
@@ -28,83 +31,6 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-const originalText = `# John Doe
-## Software Engineer
-
-- **Email:** john.doe@email.com
-- **Phone:** (123) 456-7890
-- **Location:** New York, NY
-
-### Summary
-Experienced software engineer with a passion for creating efficient and scalable applications.
-
-### Skills
-- JavaScript, TypeScript, React, Node.js
-- Python, Django
-- SQL, MongoDB
-- Git, Docker
-
-### Experience
-#### Senior Software Engineer | Tech Corp
-*January 2018 - Present*
-- Led development of core features for the company's main product
-- Mentored junior developers and conducted code reviews
-
-#### Software Engineer | StartUp Inc
-*June 2015 - December 2017*
-- Developed and maintained multiple web applications
-- Collaborated with cross-functional teams to deliver high-quality software
-
-### Education
-**Bachelor of Science in Computer Science**
-University of Technology | Graduated: May 2015`;
-
-const modifiedText = `# John Doe
-## Senior Software Engineer
-
-- **Email:** john.doe@email.com
-- **Phone:** (123) 456-7890
-- **Location:** San Francisco, CA
-
-### Summary
-Highly skilled senior software engineer with expertise in building scalable and efficient applications. Strong leadership and mentoring abilities.
-
-### Skills
-- JavaScript, TypeScript, React, Node.js, Vue.js
-- Python, Django, Flask
-- SQL, MongoDB, Redis
-- Git, Docker, Kubernetes
-- CI/CD, AWS
-
-### Experience
-#### Lead Software Engineer | Tech Innovators
-*July 2021 - Present*
-- Architected and implemented microservices-based backend infrastructure
-- Led a team of 5 developers, improving team productivity by 30%
-- Introduced and standardized best practices for code quality and testing
-
-#### Senior Software Engineer | Tech Corp
-*January 2018 - June 2021*
-- Spearheaded development of core features for the company's main product
-- Mentored junior developers and conducted regular code reviews
-- Optimized database queries, resulting in a 40% improvement in application performance
-
-#### Software Engineer | StartUp Inc
-*June 2015 - December 2017*
-- Developed and maintained multiple web applications
-- Collaborated with cross-functional teams to deliver high-quality software
-- Implemented automated testing, reducing bug reports by 50%
-
-### Education
-**Master of Science in Software Engineering**
-Tech University | Graduated: December 2020
-
-**Bachelor of Science in Computer Science**
-University of Technology | Graduated: May 2015
-
-### Certifications
-- AWS Certified Solutions Architect
-- Certified Scrum Master`;
 
 export default function Layout({ signOut }) {
   const [currentPage, setCurrentPage] = useState('Job Post');
@@ -263,7 +189,7 @@ export default function Layout({ signOut }) {
             {currentPage === 'Editor' && <Editor />}
             {currentPage === 'Job Post' && <JobPostProcessor />}
             {currentPage === 'Resume' && <ResumeProcessor />}
-
+            {currentPage === 'Tailored Resume' && <TailoredResume />}
           </div>
         </main>
       </div>

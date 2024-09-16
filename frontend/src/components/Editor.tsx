@@ -36,23 +36,11 @@ const Editor: React.FC = () => {
             const response = await body.json();
             setOriginalSections(response.semantic_sections);
             setTailoredSections(response.tailored_sections);
-            console.log(response);
         } catch (err) {
             setError('Error analyzing job post. Please try again.');
-            console.error('POST call failed: ', err);
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const handleUpdateTailoredContent = (index: number, newContent: string) => {
-        const newTailoredSections = [...tailoredSections];
-        newTailoredSections[index].tailored_section.content = newContent;
-        setTailoredSections(newTailoredSections);
-    };
-
-    const generateTailoredResume = () => {
-        return tailoredSections.map(section => `## ${section.tailored_section.header}\n\n${section.tailored_section.content}`).join('\n\n');
     };
 
     return (
@@ -77,12 +65,11 @@ const Editor: React.FC = () => {
                 <Render
                     originalSections={originalSections}
                     tailoredSections={tailoredSections}
-                    onUpdateTailoredContent={handleUpdateTailoredContent}
                 />
             </div>
             {showTailoredResume && (
                 <TailoredResumeView
-                    tailoredResume={generateTailoredResume()}
+                    tailoredSections={tailoredSections}
                     onClose={() => setShowTailoredResume(false)}
                 />
             )}

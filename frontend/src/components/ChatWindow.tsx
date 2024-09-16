@@ -9,7 +9,6 @@ interface ChatWindowProps {
   onClose: () => void;
   conversationId: string;
   onUpdateTailoredContent: (content: string) => void;
-  onActivateEditingMode: () => void;
 }
 
 interface Message {
@@ -32,7 +31,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   onClose,
   conversationId,
   onUpdateTailoredContent,
-  onActivateEditingMode
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -142,7 +140,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
         if (response.tailored_section) {
           onUpdateTailoredContent(response.tailored_section);
-          onActivateEditingMode();
         }
       } catch (error) {
         console.error('Error sending message:', error);

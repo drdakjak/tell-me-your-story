@@ -41,11 +41,9 @@ const ResumeProcessor: React.FC = () => {
       const { body } = await restOperation.response;
       const response = await body.json();
       setAnalyzedResume(response);
-      console.log(response);
 
     } catch (err) {
       setError('Error analyzing resume. Please try again.');
-      console.log('POST call failed: ', JSON.parse(err.response.body));
     } finally {
       setIsLoading(false);
     }

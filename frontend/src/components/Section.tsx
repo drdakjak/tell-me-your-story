@@ -3,29 +3,18 @@ import ReactMarkdown from 'react-markdown';
 import ChatWindow from './ChatWindow';
 import DiffPopup from './DiffPopup';
 
-interface DiffSectionProps {
+interface Section {
   section: any;
-  index: number;
-  onEdit: (index: number) => void;
-  onSave: (index: number, newHeader: string, newContent: string) => void;
-  onUpdateTailoredContent: (content: string) => void;
-  isEditing: boolean;
-  setIsEditing: (isEditing: boolean) => void;
 }
 
-const DiffSection: React.FC<DiffSectionProps> = ({ 
-  section, 
-  index, 
-  onEdit, 
-  onSave, 
-  onUpdateTailoredContent,
-  isEditing,
-  setIsEditing
+const Section: React.FC<SectionProps> = ({
+  section,
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDiffPopupOpen, setIsDiffPopupOpen] = useState(false);
   const [editedHeader, setEditedHeader] = useState(section.tailoredHeader);
   const [editedContent, setEditedContent] = useState(section.tailoredContent);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleOpenChat = () => {
     setIsChatOpen(true);
@@ -35,19 +24,26 @@ const DiffSection: React.FC<DiffSectionProps> = ({
     setIsChatOpen(false);
   };
 
-  const handleSave = () => {
-    onSave(index, editedHeader, editedContent);
-    setIsEditing(false);
-  };
-
   const toggleDiffPopup = () => {
     setIsDiffPopupOpen(!isDiffPopupOpen);
   };
 
-  const handleActivateEditingMode = () => {
+  const handleIsEdditing = () => {
     setIsEditing(true);
-    onEdit(index);
   };
+
+  const handleSave = () => {
+    section.tailoredHeader = editedHeader;
+    section.tailoredContent = editedContent;
+    setIsEditing(false);
+  };
+
+  const handleUpdateTailoredContent = (newContent: string) => {
+    setEditedContent(newContent)
+    section.tailoredContent = editedContent;
+    setIsEditing(true);
+  };
+
 
   return (
     <div className="mb-4 pb-4 border-b">
@@ -84,7 +80,7 @@ const DiffSection: React.FC<DiffSectionProps> = ({
             <ReactMarkdown>{section.tailoredContent}</ReactMarkdown>
           </div>
           <button
-            onClick={handleActivateEditingMode}
+            onClick={handleIsEdditing}
             className="p-2 mr-2 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
             title="Edit"
           >
@@ -119,8 +115,7 @@ const DiffSection: React.FC<DiffSectionProps> = ({
         isOpen={isChatOpen}
         onClose={handleCloseChat}
         conversationId={section.conversationId}
-        onUpdateTailoredContent={onUpdateTailoredContent}
-        onActivateEditingMode={handleActivateEditingMode}
+        onUpdateTailoredContent={handleUpdateTailoredContent}
       />
       {isDiffPopupOpen && (
         <DiffPopup
@@ -136,4 +131,4 @@ const DiffSection: React.FC<DiffSectionProps> = ({
   );
 };
 
-export default DiffSection;
+export default Section;

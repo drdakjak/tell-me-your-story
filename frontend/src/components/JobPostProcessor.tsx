@@ -45,7 +45,6 @@ const JobPostProcessor: React.FC = () => {
 
     } catch (err) {
       setError('Error analyzing job post. Please try again.');
-      console.log('POST call failed: ', JSON.parse(err.response.body));
     } finally {
       setIsLoading(false);
     }

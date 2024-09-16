@@ -1,4 +1,5 @@
 import React from 'react';
+import { diff_match_patch } from 'diff-match-patch';
 
 interface DiffPopupProps {
   originalHeader: string;
@@ -14,9 +15,12 @@ const DiffPopup: React.FC<DiffPopupProps> = ({
   originalContent,
   tailoredHeader,
   tailoredContent,
-  diffs,
   onClose,
 }) => {
+  const dmp = new diff_match_patch();
+  const diffs = dmp.diff_main(originalContent, tailoredContent);
+  dmp.diff_cleanupSemantic(diffs);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-md p-4 w-3/4 max-w-2xl">
