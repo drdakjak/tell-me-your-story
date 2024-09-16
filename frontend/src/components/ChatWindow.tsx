@@ -9,6 +9,7 @@ interface ChatWindowProps {
   onClose: () => void;
   conversationId: string;
   onUpdateTailoredContent: (content: string) => void;
+  onActivateEditingMode: () => void;
 }
 
 interface Message {
@@ -30,9 +31,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   isOpen,
   onClose,
   conversationId,
-  onUpdateTailoredContent
+  onUpdateTailoredContent,
+  onActivateEditingMode
 }) => {
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isWaiting, setIsWaiting] = useState(false);
@@ -51,7 +52,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-  const formatAIResponse = ( content ) => {
+
+  const formatAIResponse = (content) => {
     let message = content.response;
     if (content.tailored_section) {
       message += "\n\n";
@@ -130,7 +132,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             }
           }
         }).response;
-        const response = await body.json();
+        let response = await body.json();
 
         const botResponse: Message = {
           type: 'ai',
@@ -140,6 +142,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
         if (response.tailored_section) {
           onUpdateTailoredContent(response.tailored_section);
+          onActivateEditingMode();
         }
       } catch (error) {
         console.error('Error sending message:', error);

@@ -9,6 +9,8 @@ interface DiffSectionProps {
   onEdit: (index: number) => void;
   onSave: (index: number, newHeader: string, newContent: string) => void;
   onUpdateTailoredContent: (content: string) => void;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 const DiffSection: React.FC<DiffSectionProps> = ({ 
@@ -16,7 +18,9 @@ const DiffSection: React.FC<DiffSectionProps> = ({
   index, 
   onEdit, 
   onSave, 
-  onUpdateTailoredContent 
+  onUpdateTailoredContent,
+  isEditing,
+  setIsEditing
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDiffPopupOpen, setIsDiffPopupOpen] = useState(false);
@@ -33,15 +37,21 @@ const DiffSection: React.FC<DiffSectionProps> = ({
 
   const handleSave = () => {
     onSave(index, editedHeader, editedContent);
+    setIsEditing(false);
   };
 
   const toggleDiffPopup = () => {
     setIsDiffPopupOpen(!isDiffPopupOpen);
   };
 
+  const handleActivateEditingMode = () => {
+    setIsEditing(true);
+    onEdit(index);
+  };
+
   return (
     <div className="mb-4 pb-4 border-b">
-      {section.isEditing ? (
+      {isEditing ? (
         <>
           <textarea
             value={editedHeader}
@@ -74,7 +84,7 @@ const DiffSection: React.FC<DiffSectionProps> = ({
             <ReactMarkdown>{section.tailoredContent}</ReactMarkdown>
           </div>
           <button
-            onClick={() => onEdit(index)}
+            onClick={handleActivateEditingMode}
             className="p-2 mr-2 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
             title="Edit"
           >
@@ -110,6 +120,7 @@ const DiffSection: React.FC<DiffSectionProps> = ({
         onClose={handleCloseChat}
         conversationId={section.conversationId}
         onUpdateTailoredContent={onUpdateTailoredContent}
+        onActivateEditingMode={handleActivateEditingMode}
       />
       {isDiffPopupOpen && (
         <DiffPopup

@@ -30,6 +30,7 @@ const Render: React.FC<RenderProps> = ({
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
   const [showAdvicePopup, setShowAdvicePopup] = useState<number | null>(null);
+  const [editingSectionIndex, setEditingSectionIndex] = useState<number | null>(null);
   const dmp = new diff_match_patch();
 
   useEffect(() => {
@@ -50,7 +51,6 @@ const Render: React.FC<RenderProps> = ({
         isEditing: false,
       };
     });
-    console.log(newSections);
     setSections(newSections);
   }, [originalSections, tailoredSections]);
 
@@ -64,6 +64,7 @@ const Render: React.FC<RenderProps> = ({
   }, []);
 
   const handleEdit = (index: number) => {
+    setEditingSectionIndex(index);
     const newSections = [...sections];
     newSections[index].isEditing = true;
     setSections(newSections);
@@ -78,6 +79,7 @@ const Render: React.FC<RenderProps> = ({
     dmp.diff_cleanupSemantic(newSections[index].diffs);
     setSections(newSections);
     onUpdateTailoredContent(index, newContent);
+    setEditingSectionIndex(null);
   };
 
   const openAdvicePopup = (index: number) => {
@@ -128,6 +130,14 @@ const Render: React.FC<RenderProps> = ({
                 onEdit={handleEdit}
                 onSave={handleSave}
                 onUpdateTailoredContent={(content: string) => onUpdateTailoredContent(index, content)}
+                isEditing={editingSectionIndex === index}
+                setIsEditing={(isEditing: boolean) => {
+                  if (isEditing) {
+                    setEditingSectionIndex(index);
+                  } else {
+                    setEditingSectionIndex(null);
+                  }
+                }}
               />
             </div>
           </div>
