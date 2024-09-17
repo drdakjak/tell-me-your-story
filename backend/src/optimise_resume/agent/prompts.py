@@ -20,10 +20,15 @@ You are an expert resume writer specializing in tailoring resumes to specific jo
 **Objective:** 
 USE MAXIMALLY 300 WORDS FOR TAILORED SECTION. Use maximally three or less bullet points for each section.
 Include only highligts from each section that are relevant to the job requirements.
+You can use the other sections of the original resume to enhance the tailored section.
 
 **JOB REQUIREMENTS:**
 
 {job_requirements}
+
+**ORIGINAL RESUME:**
+
+{original_resume}
 """
 
 RESUME_ADVICER ="""

@@ -8,7 +8,6 @@ user_table = get_user_table()
 
 
 def process_resume_section(resume_section, workflow, job_requirements, original_resume):
-    keys_to_include = ["advice", "tailored_section"]
     if resume_section["content"]:
         final_state = invoke_graph(
             workflow,
@@ -17,9 +16,11 @@ def process_resume_section(resume_section, workflow, job_requirements, original_
             original_resume=original_resume,
             debug=False,
         )
-        tailored_section = {key: final_state[key] for key in keys_to_include}
+        tailored_section = final_state["tailored_section"]
+        tailored_section["advice"] = final_state["advice"] 
     else:
-        tailored_section = {"advice": "", "tailored_section": resume_section}
+        tailored_section = resume_section
+        tailored_section["advice"] = ""
 
     return tailored_section
 

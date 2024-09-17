@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
+import { put } from '@aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 import ChatWindow from './ChatWindow';
 import DiffPopup from './DiffPopup';
 
-interface Section {
+interface SectionProps {
   section: any;
 }
 
-const Section: React.FC<SectionProps> = ({
-  section,
+const TailoredSection: React.FC<SectionProps> = ({
+  section
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDiffPopupOpen, setIsDiffPopupOpen] = useState(false);
-  const [editedHeader, setEditedHeader] = useState(section.tailoredHeader);
-  const [editedContent, setEditedContent] = useState(section.tailoredContent);
+  const [editedHeader, setEditedHeader] = useState(section.tailoredSection.header);
+  const [editedContent, setEditedContent] = useState(section.tailoredSection.content);
   const [isEditing, setIsEditing] = useState(false);
 
   const handleOpenChat = () => {
@@ -32,15 +33,34 @@ const Section: React.FC<SectionProps> = ({
     setIsEditing(true);
   };
 
+  const updateSection = async ( section ) => {
+    try{
+      console.log(section);
+      const { body } = await put({
+        apiName: 'Api',
+        path: 'update_tailored_section',
+        options: {
+          body: section
+        }
+      }).response;
+      const response = await body.json();
+      console.log(response);
+    } catch (error) {
+      console.error('Error updating section:', error);
+    }
+  };
+
   const handleSave = () => {
-    section.tailoredHeader = editedHeader;
-    section.tailoredContent = editedContent;
+
+    updateSection(section.tailoredSection);
+    section.tailoredSection.header = editedHeader;
+    section.tailoredSection.content = editedContent;
     setIsEditing(false);
   };
 
   const handleUpdateTailoredContent = (newContent: string) => {
     setEditedContent(newContent)
-    section.tailoredContent = editedContent;
+    section.tailoredSection.content = editedContent;
     setIsEditing(true);
   };
 
@@ -74,10 +94,10 @@ const Section: React.FC<SectionProps> = ({
       ) : (
         <>
           <h3 className="font-bold mb-2">
-            <ReactMarkdown>{section.tailoredHeader}</ReactMarkdown>
+            <ReactMarkdown>{section.tailoredSection.header}</ReactMarkdown>
           </h3>
           <div className="w-full p-2 border rounded bg-white whitespace-pre-wrap">
-            <ReactMarkdown>{section.tailoredContent}</ReactMarkdown>
+            <ReactMarkdown>{section.tailoredSection.content}</ReactMarkdown>
           </div>
           <button
             onClick={handleIsEdditing}
@@ -110,20 +130,19 @@ const Section: React.FC<SectionProps> = ({
         </svg>
       </button>
       <ChatWindow
-        sectionHeader={section.tailoredHeader}
-        sectionContent={section.tailoredContent}
+        sectionHeader={section.tailoredSection.header}
+        sectionContent={section.originalSection.content}
         isOpen={isChatOpen}
         onClose={handleCloseChat}
-        conversationId={section.conversationId}
+        conversationId={section.tailoredSection.section_id}
         onUpdateTailoredContent={handleUpdateTailoredContent}
       />
       {isDiffPopupOpen && (
         <DiffPopup
-          originalHeader={section.originalHeader}
-          originalContent={section.originalContent}
-          tailoredHeader={section.tailoredHeader}
-          tailoredContent={section.tailoredContent}
-          diffs={section.diffs}
+          originalHeader={section.originalSection.header}
+          originalContent={section.originalSection.content}
+          tailoredHeader={section.tailoredSection.header}
+          tailoredContent={section.tailoredSection.content}
           onClose={toggleDiffPopup}
         />
       )}
@@ -131,4 +150,4 @@ const Section: React.FC<SectionProps> = ({
   );
 };
 
-export default Section;
+export default TailoredSection;

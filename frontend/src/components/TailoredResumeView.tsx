@@ -5,12 +5,14 @@ interface TailoredResumeViewProps {
   tailoredSections: any[];
   onClose: () => void;
 }
+
 const generateTailoredResume = ( tailoredSections ) => {
-  return tailoredSections.map(section => `## ${section.tailored_section.header}\n\n${section.tailored_section.content}`).join('\n\n');
+  return tailoredSections.map(section => `## ${section.header}\n\n${section.content}`).join('\n\n');
 };
 
 const TailoredResumeView: React.FC<TailoredResumeViewProps> = ({ tailoredSections, onClose }) => {
   
+ 
 
   const tailoredResume = generateTailoredResume(tailoredSections)
   return (
@@ -24,7 +26,7 @@ const TailoredResumeView: React.FC<TailoredResumeViewProps> = ({ tailoredSection
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h2 className="text-xl font-bold mb-4">Overall Tailored Resume</h2>
+        <h2 className="text-xl font-bold mb-4">Tailored Resume</h2>
         <ReactMarkdown>{tailoredResume}</ReactMarkdown>
       </div>
     </div>

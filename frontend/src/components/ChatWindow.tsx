@@ -65,7 +65,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     try {
       const { body } = await post({
         apiName: 'Api',
-        path: '/invoke_chat',
+        path: 'invoke_chat',
         options: {
           body: {
             conversationId,
@@ -96,7 +96,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     try {
       await post({
         apiName: 'Api',
-        path: '/reset_chat',
+        path: 'reset_chat',
         options: {
           body: {
             conversationId,
@@ -121,7 +121,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       try {
         const { body } = await post({
           apiName: 'Api',
-          path: '/chat_resume',
+          path: 'chat_resume',
           options: {
             body: {
               conversationId,

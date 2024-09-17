@@ -5,6 +5,7 @@ import JobPostProcessor from './JobPostProcessor';
 import ResumeProcessor from './ResumeProcessor';
 import TailoredResume from './TailoredResume';
 import Editor from './Editor';
+import { useAppContext } from './AppContext';
 
 
 
@@ -14,13 +15,7 @@ const user = {
   imageUrl:
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
-const navigation = [
-  { name: 'Job Post', href: '#', current: true },
-  { name: 'Resume', href: '#', current: false },
-  { name: 'Editor', href: '#', current: false },
-  { name: 'Tailored Resume', href: '#', current: false },
 
-]
 const userNavigation = [
   { name: 'Your Profile', action: '#' },
   { name: 'Settings', action: '#' },
@@ -32,8 +27,14 @@ function classNames(...classes: string[]) {
 }
 
 
-export default function Layout({ signOut }) {
-  const [currentPage, setCurrentPage] = useState('Job Post');
+const Layout: React.FC = ({ signOut }) => {
+  const { currentPage, setCurrentPage } = useAppContext();
+  const navigation = [
+    { name: 'Job Post', action: () => setCurrentPage('Job Post') },
+    { name: 'Resume', action: () => setCurrentPage('Resume') },
+    { name: 'Editor', action: () => setCurrentPage('Editor') },
+    { name: 'Tailored Resume', action: () => setCurrentPage('Tailored Resume') },
+  ];
 
   const handleNavigation = (pageName: string) => {
     setCurrentPage(pageName);
@@ -196,3 +197,4 @@ export default function Layout({ signOut }) {
     </>
   );
 };
+export default Layout;

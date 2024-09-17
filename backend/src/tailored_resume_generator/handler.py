@@ -1,0 +1,52 @@
+import json
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from clients import get_user_table, get_model
+from prompt import RESUME_DESIGNER_PROMPT
+from config import MODEL_NAME
+
+
+user_table = get_user_table()
+model = get_model(MODEL_NAME)
+
+
+def format_resume(sections):
+    return "\n\n".join(
+        [f'{section["header"]}\n\n{section["content"]}' for section in sections]
+    )
+
+
+def handler(event, context):
+    try:
+        user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
+        response = user_table.get_item(Key={"id": user_id})
+        tailored_sections = response["Item"]["tailored_sections"]
+
+        system_message = SystemMessage(content=RESUME_DESIGNER_PROMPT)
+        user_prompt = HumanMessage(content=format_resume(tailored_sections))
+
+        messages = [system_message, user_prompt]
+        chain = model | StrOutputParser()
+        response = chain.invoke(messages)
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
+            "body": json.dumps(response),
+        }
+    except Exception as e:
+        print(str(e))
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
+            "body": json.dumps({"error": str(e)}),
+        }

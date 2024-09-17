@@ -32,7 +32,7 @@ const ResumeProcessor: React.FC = () => {
     try {
       const restOperation = post({
         apiName: 'Api',
-        path: '/process_resume',
+        path: 'process_resume',
         options: {
           body: { resume }
         }

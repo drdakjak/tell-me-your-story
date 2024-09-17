@@ -1,33 +1,35 @@
 import os
 import json
-from typing import Union
 
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.tools import tool
-from langchain_core.output_parsers import PydanticOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from dotenv import load_dotenv
-from regex import F
-from sqlalchemy import JSON
 
+from prompt import INIT_PROMPT
 from config import MODEL_NAME
+from clients import get_user_table
+
 
 load_dotenv()
 
 SESSION_TABLE = os.environ["SESSIONTABLE_TABLE_NAME"]
 
+user_table = get_user_table()
 
-def get_message_history(conversation_id: str):
+
+def get_message_history(session_id: str):
     message_history = DynamoDBChatMessageHistory(
-        table_name=SESSION_TABLE, session_id=str(conversation_id)
+        table_name=SESSION_TABLE, session_id=str(session_id)
     )
     return message_history
+
 
 class Response(BaseModel):
     response: str = Field(
@@ -43,72 +45,90 @@ def handler(event, context):
         body = json.loads(event["body"])
         conversation_id = body["conversationId"]
         tailored_section = body["tailoredSection"]
+        original_section = body["originalSection"]
         user_message = body["message"]
 
-        parser = JsonOutputParser()
+        user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
+        response = user_table.get_item(Key={"id": user_id})
+        job_requirements = response["Item"]["job_requirements"]
+        original_resume = response["Item"]["original_resume"]
 
+        @tool
+        def get_resume() -> str:
+            """
+            Returns the whole resume provided by user.
+            """
+            return original_resume
+
+        llm = ChatOpenAI(
+            model=MODEL_NAME,
+            api_key=os.environ["OPENAI_API_KEY"],
+            temperature=0.0000001,
+        )
+
+        tools = [get_resume]
+        llm_with_tools = llm.bind_tools(tools)
+
+        parser = JsonOutputParser()
+        system_prompt = INIT_PROMPT.format(
+            original_section=original_section,
+            tailored_section=tailored_section,
+            job_requirements=job_requirements,
+        )
         prompt = ChatPromptTemplate.from_messages(
             [
+                ("system", system_prompt),
                 MessagesPlaceholder(variable_name="history"),
-                ("human", "{user_message}"),
+                ("user", "{user_message}"),
             ]
         )
 
-        @tool
-        def get_current_tailored_section() -> str:
-            """
-            Returns the current tailored section.
-            """
-            return tailored_section
-
-        llm = ChatOpenAI(
-            model=MODEL_NAME, api_key=os.environ["OPENAI_API_KEY"], temperature=0.0000001
-        )
-
-        tools = [get_current_tailored_section]
-        llm_with_tools = llm.bind_tools(tools)
         chain = prompt | llm_with_tools
-
         chain_with_chat_history = RunnableWithMessageHistory(
             chain,
-            lambda session_id: get_message_history(session_id),
+            get_message_history,
             input_messages_key="user_message",
             history_messages_key="history",
         )
 
         config = {"configurable": {"session_id": conversation_id}}
         response = chain_with_chat_history.invoke(
-            {"user_message": user_message}, config=config
+            {
+                "user_message": user_message,
+            },
+            config=config,
         )
 
         if response.tool_calls:
-
             for tool_call in response.tool_calls:
                 selected_tool = eval(tool_call["name"].lower())
                 tool_msg = selected_tool.invoke(tool_call)
                 history = get_message_history(conversation_id)
                 history.add_message(tool_msg)
 
-            response = llm_with_tools.invoke(history.messages)
+            messages = [SystemMessage(content=system_prompt), *history.messages]
+            response = llm_with_tools.invoke(messages)
             history.add_message(response)
 
-        parsed_response =  parser.parse(response.content)
-
-        return {"statusCode": 200, 
-                'headers': {
-                    "Access-Control-Allow-Headers": "*",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "*",
-                },
-                "body": json.dumps(parsed_response)
-        }
-    except Exception as e:
+        parsed_response = parser.parse(response.content)
         return {
-            "statusCode": 500,
-            "body": json.dumps(e.__repr__()),
-            'headers': {
+            "statusCode": 200,
+            "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "*",
-            }
+            },
+            "body": json.dumps(parsed_response),
+        }
+    except Exception as e:
+        print(e)
+
+        return {
+            "statusCode": 500,
+            "body": json.dumps(e.__repr__()),
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
         }

@@ -1,0 +1,10 @@
+{
+    "body": "{\"header\": \"Contact Information\", \"content\": \"Jakub Drdak  \\n+XXX XXX XXX XXX  \\nx@gmail.com  \\nlinkedin.com/in/x  \\n\\n\", \"section_id\": \"Z2P8yMbzhxGWoyYubDodms\", \"advice\": \"1. **Improvement Suggestions**\\n\\n   a) **Relevance to the job post**: \\n   - While the contact information is essential, it does not directly relate to the job requirements. Ensure that the header includes a title or a brief professional summary that aligns with the job post, such as \\\"Software Developer with Machine Learning Expertise.\\\"\\n\\n   b) **ATS compatibility**: \\n   - The contact information is generally ATS-friendly. However, ensure that the email and LinkedIn URL are hyperlinked in digital formats, as some ATS may parse links differently. Also, consider using a professional email address that includes your name for a more polished appearance.\\n\\n   c) **Overall appeal to human reviewers**: \\n   - The contact information is straightforward, but adding a professional title or a brief tagline can enhance its appeal. For example, \\\"Jakub Drdak | Software Developer | Machine Learning Enthusiast\\\" can make a stronger first impression.\\n\\n2. **Overall score on the scale of 1-10**: \\n   - **Score: 5/10**. The section is functional but lacks elements that would make it stand out to both ATS and human reviewers. Adding a professional title and ensuring a polished presentation would improve its effectiveness.\"}",
+    "requestContext": {
+        "authorizer": {
+            "claims": {
+                "sub": "1234567890"
+            }
+        }
+    }
+}

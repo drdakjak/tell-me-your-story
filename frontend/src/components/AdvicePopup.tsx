@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { FaTimes } from 'react-icons/fa';
 
 interface AdvicePopupProps {
   advice: string;

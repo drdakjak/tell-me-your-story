@@ -1,6 +1,6 @@
 from typing import List
 
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from langchain_core.messages import HumanMessage, SystemMessage
 import shortuuid
 
@@ -26,7 +26,6 @@ def resume_parser(resume):
         HumanMessage(content=f"RESUME:\n\n{resume}"),
     ]
 
-    # Define a chat model and invoke it with the messages
     sections_structured = model.with_structured_output(Sections).invoke(messages)
     sections = sections_structured.dict()
     sections = [

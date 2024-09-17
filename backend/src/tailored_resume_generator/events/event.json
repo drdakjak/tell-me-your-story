@@ -1,10 +1,10 @@
 {
+    "body":{},
     "requestContext": {
         "authorizer": {
             "claims": {
                 "sub": "1234567890"
             }
         }
-    },
-    "body": "{\"conversationId\": \"0\"}"
+    }
 }

@@ -27,7 +27,7 @@ const Editor: React.FC = () => {
         try {
             const { body } = await post({
                 apiName: 'Api',
-                path: '/optimise_resume',
+                path: 'optimise_resume',
                 options: {
                     body: {}
                 }
@@ -55,7 +55,7 @@ const Editor: React.FC = () => {
                     <button
                         onClick={() => setShowTailoredResume(true)}
                         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        Show Overall Tailored Resume
+                        Show Tailored Resume
                     </button>
                 )}
             </div>

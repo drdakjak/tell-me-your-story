@@ -1,5 +1,3 @@
 {
-    "body":{
-        "conversation_id":"0"
-    }
+    "body": "{\"conversationId\": \"0\"}"
 }

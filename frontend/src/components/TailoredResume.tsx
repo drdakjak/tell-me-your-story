@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { post } from '@aws-amplify/api';
+import { get } from '@aws-amplify/api';
 import Markdown from 'react-markdown';
 import ResumeExporter from './ResumeExporter';
 
@@ -12,14 +12,16 @@ const TailoredResume: React.FC = () => {
         setIsLoading(true);
         setError('');
         try {
-          const restOperation = post({
+          const restOperation = get({
             apiName: 'Api',
-            path: '/tailored_resume'
+            path: 'tailored_resume'
           });
     
           const { body } = await restOperation.response;
           const response = await body.json();
+
           setTailoredResume(response);
+
         
         } catch (err) {
           setError('Loading the resume failed. Please try again.');
@@ -27,15 +29,17 @@ const TailoredResume: React.FC = () => {
           setIsLoading(false);
         }
       };
-    // fetchResume();
+    
     useEffect(() => {
       // Simulate fetching the tailored resume
-      setTailoredResume("#sddfsdfds");
+      fetchResume();
     }, []); // Empty dependency array ensures this runs only once
   
 
     return (
         <div>
+          {isLoading && <p className="text-gray-600">Loading...</p>}
+          {error && <p className="text-red-600">{error}</p>}
             <Markdown>{tailoredResume}</Markdown>
             <ResumeExporter textToDownload={tailoredResume} />
         </div>

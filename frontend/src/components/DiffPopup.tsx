@@ -6,7 +6,6 @@ interface DiffPopupProps {
   originalContent: string;
   tailoredHeader: string;
   tailoredContent: string;
-  diffs: [number, string][];
   onClose: () => void;
 }
 

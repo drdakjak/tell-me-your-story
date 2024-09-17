@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import Section from './Section';
+import TailoredSection from './TailoredSection';
 import AdvicePopup from './AdvicePopup';
 import { FaLightbulb } from 'react-icons/fa';
 
-interface OriginalSection {
+interface OriginalSectionInterface {
   header: string;
   content: string;
   section_id: string;
 }
 
-interface TailoredSection {
+interface TailoredSectionInterface {
   advice: string;
-  tailored_section: OriginalSection;
+  tailored_section: OriginalSectionInterface;
 }
 
 interface RenderProps {
-  originalSections: OriginalSection[];
-  tailoredSections: TailoredSection[];
+  originalSections: OriginalSectionInterface[];
+  tailoredSections: TailoredSectionInterface[];
 }
 
-const Render: React.FC<RenderProps> = ({ 
-  originalSections, 
-  tailoredSections, 
+const Render: React.FC<RenderProps> = ({
+  originalSections,
+  tailoredSections,
 }) => {
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
@@ -30,19 +30,14 @@ const Render: React.FC<RenderProps> = ({
 
   useEffect(() => {
     const newSections = originalSections.map((originalSection, index) => {
-      const advice = tailoredSections[index].advice;
-      const tailoredSection = tailoredSections[index].tailored_section || { header: '', content: '' };
-   
+      const tailoredSection = tailoredSections[index];
 
       return {
-        originalHeader: originalSection.header,
-        originalContent: originalSection.content,
-        advice: advice,
-        tailoredHeader: tailoredSection.header,
-        tailoredContent: tailoredSection.content,
-        conversationId: originalSection.section_id,
+        originalSection: originalSection,
+        tailoredSection: tailoredSection, 
       };
     });
+    console.log(newSections);
     setSections(newSections);
   }, [originalSections, tailoredSections]);
 
@@ -83,21 +78,21 @@ const Render: React.FC<RenderProps> = ({
           <div key={index} className={`mb-4 ${isDesktopView ? 'md:flex' : ''}`}>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
               <h3 className="text-md font-semibold mb-2">
-                <ReactMarkdown>{section.originalHeader}</ReactMarkdown>
+                <ReactMarkdown>{section.originalSection.header}</ReactMarkdown>
               </h3>
               <div className="w-full p-2 border rounded bg-white whitespace-pre-wrap">
-                <ReactMarkdown>{section.originalContent}</ReactMarkdown>
+                <ReactMarkdown>{section.originalSection.content}</ReactMarkdown>
               </div>
               <button
                 onClick={() => openAdvicePopup(index)}
                 className="p-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold rounded-full"
                 title="Advice"
               >
-                <FaLightbulb className="h-5 w-5" /> 
+                <FaLightbulb className="h-5 w-5" />
               </button>
             </div>
             <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
-              <Section
+              <TailoredSection
                 section={section}
               />
             </div>
@@ -106,8 +101,8 @@ const Render: React.FC<RenderProps> = ({
       </div>
       {showAdvicePopup !== null && (
         <AdvicePopup
-          advice={sections[showAdvicePopup].advice}
-          header={sections[showAdvicePopup].tailoredHeader}
+          advice={sections[showAdvicePopup].tailoredSection.advice}
+          header={sections[showAdvicePopup].tailoredSection.header}
           onClose={() => setShowAdvicePopup(null)}
         />
       )}

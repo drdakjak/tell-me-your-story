@@ -1,7 +1,6 @@
 import logging
 
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_core.pydantic_v1 import BaseModel, Field
 from typing_extensions import Annotated, TypedDict
 
 from .state import AgentState
@@ -16,6 +15,9 @@ logger.setLevel(logging.INFO)
 
 def format_job_requirements(job_requirements) -> str:
     return f"\n{job_requirements}\n"
+
+def format_original_resume(original_resume) -> str:
+    return f"\n{original_resume}\n"
 
 
 def format_section(section) -> str:
@@ -71,6 +73,7 @@ def get_tailored_section(state: AgentState):
 
     system_promp = RESUME_WRITER.format(
         job_requirements=format_job_requirements(state["job_requirements"]),
+        original_resume=format_original_resume(state["original_resume"])
     )
     user_prompt = format_section(state["current_section"])
 

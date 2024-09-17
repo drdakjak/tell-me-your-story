@@ -32,7 +32,7 @@ const JobPostProcessor: React.FC = () => {
     try {
       const restOperation = post({
         apiName: 'Api',
-        path: '/process_job_post',
+        path: 'process_job_post',
         options: {
           body: { jobPost }
         }
