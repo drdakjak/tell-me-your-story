@@ -1,6 +1,6 @@
 import React from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import JobPostProcessor from './JobPostProcessor';
 import ResumeProcessor from './ResumeProcessor';
 import TailoredResume from './TailoredResume';
@@ -78,14 +78,6 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
               </div>
               <div className="hidden md:block">
                 <div className="ml-4 flex items-center md:ml-6">
-                  <button
-                    type="button"
-                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon aria-hidden="true" className="h-6 w-6" />
-                  </button>
 
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
@@ -150,14 +142,6 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                   <div className="text-base font-medium leading-none text-white">{user.name}</div>
                   <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
                 </div>
-                <button
-                  type="button"
-                  className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon aria-hidden="true" className="h-6 w-6" />
-                </button>
               </div>
               {/* TODO FIX navigation */}
               <div className="mt-3 space-y-1 px-2">
