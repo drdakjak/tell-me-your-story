@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { post } from '@aws-amplify/api';
 import Render from './SectionsRender';
-import TailoredResumeView from './TailoredResumeView';
 
 interface Section {
     header: string;
@@ -75,12 +74,6 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
                     tailoredSections={tailoredSections}
                 />
             </div>
-            {showTailoredResume && (
-                <TailoredResumeView
-                    tailoredSections={tailoredSections}
-                    onClose={() => setShowTailoredResume(false)}
-                />
-            )}
         </div>
     );
 }
