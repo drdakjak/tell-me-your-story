@@ -3,11 +3,9 @@ import ReactMarkdown from 'react-markdown';
 import { post } from 'aws-amplify/api';
 
 interface ChatWindowProps {
-  sectionHeader: string;
-  sectionContent: string;
+  section: any;
   isOpen: boolean;
   onClose: () => void;
-  conversationId: string;
   onUpdateTailoredContent: (content: string) => void;
 }
 
@@ -25,11 +23,9 @@ const WritingAnimation: React.FC = () => (
 );
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
-  sectionHeader,
-  sectionContent,
+  section,
   isOpen,
   onClose,
-  conversationId,
   onUpdateTailoredContent,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -52,14 +48,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   const formatAIResponse = (content) => {
-    let message = content.response;
+    let message = content.text;
     if (content.tailored_section) {
       message += "\n\n";
       message += content.tailored_section;
     }
     return message;
   };
-
   const invokeChat = async () => {
     setIsWaiting(true);
     try {
@@ -68,8 +63,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         path: 'invoke_chat',
         options: {
           body: {
-            conversationId,
-            originalSection: sectionContent
+            conversationId: section.originalSection.section_id
           }
         }
       }).response;
@@ -99,7 +93,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         path: 'reset_chat',
         options: {
           body: {
-            conversationId,
+            conversationId: section.originalSection.section_id,
           }
         }
       }).response;
@@ -117,6 +111,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setMessages([...messages, newMessage]);
       setInputMessage('');
       setIsWaiting(true);
+      console.log(section.originalSection.section_id);
+      console.log(section.originalSection.content);
+      console.log(section.tailoredSection.content);
+      console.log(inputMessage);
 
       try {
         const { body } = await post({
@@ -124,9 +122,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           path: 'chat_resume',
           options: {
             body: {
-              conversationId,
+              conversationId: section.originalSection.section_id,
+              tailoredSection: section.tailoredSection.content,
+              originalSection: section.originalSection.content,
               message: inputMessage,
-              tailoredSection: sectionContent
             }
           }
         }).response;
@@ -162,7 +161,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-md p-4 w-3/4 max-w-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Chat about: {sectionHeader}</h3>
+          <h3 className="text-lg font-semibold">Chat about: {section.tailoredSection.header}</h3>
           <div>
             <button
               onClick={resetChat}

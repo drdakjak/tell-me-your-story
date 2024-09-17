@@ -130,11 +130,9 @@ const TailoredSection: React.FC<SectionProps> = ({
         </svg>
       </button>
       <ChatWindow
-        sectionHeader={section.tailoredSection.header}
-        sectionContent={section.originalSection.content}
+        section={section}
         isOpen={isChatOpen}
         onClose={handleCloseChat}
-        conversationId={section.tailoredSection.section_id}
         onUpdateTailoredContent={handleUpdateTailoredContent}
       />
       {isDiffPopupOpen && (
