@@ -26,7 +26,6 @@ interface EditorProps {
 const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, tailoredSections, setTailoredSections }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const [showTailoredResume, setShowTailoredResume] = useState(false);
 
     const optimiseResume = async () => {
         setIsLoading(true);
@@ -58,13 +57,6 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Tailor Resume
                 </button>
-                {tailoredSections.length > 0 && (
-                    <button
-                        onClick={() => setShowTailoredResume(true)}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        Show Tailored Resume
-                    </button>
-                )}
             </div>
             {isLoading && <p className="text-gray-600">Loading...</p>}
             {error && <p className="text-red-600">{error}</p>}
