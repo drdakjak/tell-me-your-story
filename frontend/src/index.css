@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-secondary-800 antialiased;
+  }
+}
+
+@layer components {
+  .page-transition {
+    @apply transition-opacity duration-300 ease-in-out;
+  }
+
+  .page-enter {
+    @apply opacity-0;
+  }
+
+  .page-enter-active {
+    @apply opacity-100;
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

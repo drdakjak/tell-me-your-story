@@ -3,7 +3,7 @@ import './App.css';
 import Layout from './components/Layout';
 import { Amplify } from 'aws-amplify';
 import { fetchAuthSession } from "aws-amplify/auth";
-import { withAuthenticator, Button, Heading } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import "@aws-amplify/ui-react/styles.css";
 
 Amplify.configure({
@@ -34,16 +34,12 @@ Amplify.configure({
     }
   }
 });
+
 const App: React.FC = ({ signOut }) => {
   return (
-    <div>
-      <div className="App">
-        <Layout
-          signOut={signOut}
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-secondary-50">
+      <Layout signOut={signOut} />
     </div>
-
   );
 };
 

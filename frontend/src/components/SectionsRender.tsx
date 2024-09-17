@@ -20,13 +20,11 @@ const Render: React.FC<RenderProps> = ({
   useEffect(() => {
     const newSections = originalSections.map((originalSection, index) => {
       const tailoredSection = tailoredSections[index];
-
       return {
         originalSection: originalSection,
         tailoredSection: tailoredSection, 
       };
     });
-    console.log(newSections);
     setSections(newSections);
   }, [originalSections, tailoredSections]);
 
@@ -44,11 +42,11 @@ const Render: React.FC<RenderProps> = ({
   };
 
   return (
-    <div className="p-4 border rounded shadow-lg bg-gray-100">
-      <div className="relative mb-4 flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex justify-end mb-4">
         <button
           onClick={() => setIsDesktopView(!isDesktopView)}
-          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none absolute bottom-0 right-0"
+          className="p-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
           title={`Switch to ${isDesktopView ? 'Mobile' : 'Desktop'} View`}
         >
           {isDesktopView ? (
@@ -62,32 +60,32 @@ const Render: React.FC<RenderProps> = ({
           )}
         </button>
       </div>
-      <div className={`mb-4 font-mono text-sm ${isDesktopView ? 'md:flex flex-col' : ''}`}>
+
+      <div className={`space-y-8 ${isDesktopView ? 'md:space-y-12' : ''}`}>
         {sections.map((section, index) => (
-          <div key={index} className={`mb-4 ${isDesktopView ? 'md:flex' : ''}`}>
-            <div className={`${isDesktopView ? 'md:w-1/2 md:pr-2' : 'mb-4'}`}>
-              <h3 className="text-md font-semibold mb-2">
+          <div key={index} className={`bg-white shadow-sm rounded-lg overflow-hidden ${isDesktopView ? 'md:flex' : ''}`}>
+            <div className={`p-6 ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
+              <h3 className="text-lg font-semibold text-secondary-900 mb-4">
                 <ReactMarkdown>{section.originalSection.header}</ReactMarkdown>
               </h3>
-              <div className="w-full p-2 border rounded bg-white whitespace-pre-wrap">
+              <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
                 <ReactMarkdown>{section.originalSection.content}</ReactMarkdown>
               </div>
               <button
                 onClick={() => openAdvicePopup(index)}
-                className="p-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold rounded-full"
-                title="Advice"
+                className="mt-4 p-2 bg-accent-500 text-white rounded-full hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
+                title="View Advice"
               >
                 <FaLightbulb className="h-5 w-5" />
               </button>
             </div>
-            <div className={`${isDesktopView ? 'md:w-1/2 md:pl-2' : ''}`}>
-              <TailoredSection
-                section={section}
-              />
+            <div className={`p-6 ${isDesktopView ? 'md:w-1/2' : ''}`}>
+              <TailoredSection section={section} />
             </div>
           </div>
         ))}
       </div>
+
       {showAdvicePopup !== null && (
         <AdvicePopup
           advice={sections[showAdvicePopup].tailoredSection.advice}

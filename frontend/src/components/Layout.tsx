@@ -31,8 +31,8 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     tailoredResume, setTailoredResume,
     originalSections, setOriginalSections,
     tailoredSections, setTailoredSections
-
   } = useAppContext();
+  
   const navigation = [
     { name: 'Job Post', action: () => setCurrentPage('Job Post') },
     { name: 'Resume', action: () => setCurrentPage('Resume') },
@@ -40,34 +40,31 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     { name: 'Tailored Resume', action: () => setCurrentPage('Tailored Resume') },
   ];
 
-  const handleNavigation = (pageName: string) => {
-    setCurrentPage(pageName);
-  };
-
   return (
-    <>
-      <div className="min-h-full">
-        <Disclosure as="nav" className="bg-gray-800">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <img
-                    alt="Your Company"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                    className="h-8 w-8"
-                  />
-                </div>
-                <div className="hidden md:block">
-                  <div className="ml-10 flex items-baseline space-x-4">
+    <div className="min-h-screen bg-secondary-50">
+      <Disclosure as="nav" className="bg-primary-700 shadow-lg">
+        {({ open }) => (
+          <>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex h-16 justify-between">
+                <div className="flex">
+                  <div className="flex flex-shrink-0 items-center">
+                    <img
+                      className="h-8 w-auto"
+                      src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                      alt="Your Company"
+                    />
+                  </div>
+                  <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                     {navigation.map((item) => (
                       <a
                         key={item.name}
                         onClick={item.action}
-                        aria-current={item.name === currentPage ? 'page' : undefined}
                         className={classNames(
-                          item.name === currentPage ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'rounded-md px-3 py-2 text-sm font-medium',
+                          item.name === currentPage
+                            ? 'border-accent-500 text-white'
+                            : 'border-transparent text-primary-100 hover:border-primary-300 hover:text-white',
+                          'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium cursor-pointer transition duration-150 ease-in-out'
                         )}
                       >
                         {item.name}
@@ -75,114 +72,114 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                     ))}
                   </div>
                 </div>
-              </div>
-              <div className="hidden md:block">
-                <div className="ml-4 flex items-center md:ml-6">
-
-                  {/* Profile dropdown */}
+                <div className="hidden sm:ml-6 sm:flex sm:items-center">
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                        <span className="absolute -inset-1.5" />
+                      <MenuButton className="flex rounded-full bg-primary-700 text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
-                        <img alt="" src={user.imageUrl} className="h-8 w-8 rounded-full" />
+                        <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
                       </MenuButton>
                     </div>
-                    <MenuItems
-                      transition
-                      className="absolute flex right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-                    >
+                    <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <MenuItem key='Sign out'>
-                        <button
-                          onClick={signOut}
-                          className="grow px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
-                        >
-                          Sign out
-                        </button>
+                        {({ active }) => (
+                          <button
+                            onClick={signOut}
+                            className={classNames(
+                              active ? 'bg-secondary-100' : '',
+                              'block px-4 py-2 text-sm text-secondary-700 w-full text-left'
+                            )}
+                          >
+                            Sign out
+                          </button>
+                        )}
                       </MenuItem>
                     </MenuItems>
                   </Menu>
                 </div>
-              </div>
-              <div className="-mr-2 flex md:hidden">
-                {/* Mobile menu button */}
-                <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  <span className="absolute -inset-0.5" />
-                  <span className="sr-only">Open main menu</span>
-                  <Bars3Icon aria-hidden="true" className="block h-6 w-6 group-data-[open]:hidden" />
-                  <XMarkIcon aria-hidden="true" className="hidden h-6 w-6 group-data-[open]:block" />
-                </DisclosureButton>
+                <div className="-mr-2 flex items-center sm:hidden">
+                  <DisclosureButton className="inline-flex items-center justify-center rounded-md p-2 text-primary-100 hover:bg-primary-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </DisclosureButton>
+                </div>
               </div>
             </div>
-          </div>
 
-          <DisclosurePanel className="md:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-              {navigation.map((item) => (
-                <DisclosureButton
-                  key={item.name}
-                  as="a"
-                  onClick={() => item.action}
-                  aria-current={item.name === currentPage ? 'page' : undefined}
-                  className={classNames(
-                    item.name === currentPage ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block rounded-md px-3 py-2 text-base font-medium',
-                  )}
-                >
-                  {item.name}
-                </DisclosureButton>
-              ))}
-            </div>
-            <div className="border-t border-gray-700 pb-3 pt-4">
-              <div className="flex items-center px-5">
-                <div className="flex-shrink-0">
-                  <img alt="" src={user.imageUrl} className="h-10 w-10 rounded-full" />
-                </div>
-                <div className="ml-3">
-                  <div className="text-base font-medium leading-none text-white">{user.name}</div>
-                  <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
-                </div>
-              </div>
-              {/* TODO FIX navigation */}
-              <div className="mt-3 space-y-1 px-2">
-                {userNavigation.map((item) => (
+            <DisclosurePanel className="sm:hidden">
+              <div className="space-y-1 pb-3 pt-2">
+                {navigation.map((item) => (
                   <DisclosureButton
                     key={item.name}
                     as="a"
-                    href={item.action}
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    onClick={() => item.action()}
+                    className={classNames(
+                      item.name === currentPage
+                        ? 'bg-primary-800 border-accent-500 text-white'
+                        : 'border-transparent text-primary-100 hover:bg-primary-600 hover:border-primary-300 hover:text-white',
+                      'block border-l-4 py-2 pl-3 pr-4 text-base font-medium cursor-pointer transition duration-150 ease-in-out'
+                    )}
                   >
                     {item.name}
                   </DisclosureButton>
                 ))}
               </div>
-            </div>
-          </DisclosurePanel>
-        </Disclosure>
+              <div className="border-t border-primary-600 pb-3 pt-4">
+                <div className="flex items-center px-4">
+                  <div className="flex-shrink-0">
+                    <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-base font-medium text-white">{user.name}</div>
+                    <div className="text-sm font-medium text-primary-300">{user.email}</div>
+                  </div>
+                </div>
+                <div className="mt-3 space-y-1">
+                  <DisclosureButton
+                    as="button"
+                    onClick={signOut}
+                    className="block w-full px-4 py-2 text-base font-medium text-primary-100 hover:bg-primary-600 hover:text-white"
+                  >
+                    Sign out
+                  </DisclosureButton>
+                </div>
+              </div>
+            </DisclosurePanel>
+          </>
+        )}
+      </Disclosure>
 
-        {/* Page header */}
-        <header className="bg-white shadow">
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{currentPage}</h1>
+      <div className="py-10">
+        <header>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h1 className="text-3xl font-bold leading-tight tracking-tight text-secondary-900">{currentPage}</h1>
           </div>
         </header>
-
         <main>
-          {/* Page routing and content */}
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {currentPage === 'Editor' && <Editor
-              originalSections={originalSections}
-              setOriginalSections={setOriginalSections}
-              tailoredSections={tailoredSections}
-              setTailoredSections={setTailoredSections}
-            />}
-            {currentPage === 'Job Post' && <JobPostProcessor jobPost={jobPost} setJobPost={setJobPost} />}
-            {currentPage === 'Resume' && <ResumeProcessor resume={resume} setResume={setResume} />}
-            {currentPage === 'Tailored Resume' && <TailoredResume tailoredResume={tailoredResume} setTailoredResume={setTailoredResume} />}
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="px-4 py-8 sm:px-0">
+              <div className="rounded-lg bg-white shadow">
+                <div className="px-4 py-5 sm:p-6">
+                  {currentPage === 'Editor' && <Editor
+                    originalSections={originalSections}
+                    setOriginalSections={setOriginalSections}
+                    tailoredSections={tailoredSections}
+                    setTailoredSections={setTailoredSections}
+                  />}
+                  {currentPage === 'Job Post' && <JobPostProcessor jobPost={jobPost} setJobPost={setJobPost} />}
+                  {currentPage === 'Resume' && <ResumeProcessor resume={resume} setResume={setResume} />}
+                  {currentPage === 'Tailored Resume' && <TailoredResume tailoredResume={tailoredResume} setTailoredResume={setTailoredResume} />}
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
-    </>
+    </div>
   );
 };
 

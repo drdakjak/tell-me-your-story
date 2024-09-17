@@ -111,10 +111,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setMessages([...messages, newMessage]);
       setInputMessage('');
       setIsWaiting(true);
-      console.log(section.originalSection.section_id);
-      console.log(section.originalSection.content);
-      console.log(section.tailoredSection.content);
-      console.log(inputMessage);
 
       try {
         const { body } = await post({
