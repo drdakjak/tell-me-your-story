@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import JobPostProcessor from './JobPostProcessor';
 import ResumeProcessor from './ResumeProcessor';
 import TailoredResume from './TailoredResume';
 import Editor from './Editor';
 import { useAppContext } from './AppContext';
+import { AvatarGenerator } from 'random-avatar-generator';
+import { useAuthenticator } from '@aws-amplify/ui-react';
+
 
 const user = {
   name: 'Tom Cook',
@@ -14,18 +17,13 @@ const user = {
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
 
-const userNavigation = [
-  { name: 'Your Profile', action: '#' },
-  { name: 'Settings', action: '#' },
-  { name: 'Sign out', action: '#' },
-]
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
 const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
-  const { currentPage, setCurrentPage,
+  const { 
+    currentPage, setCurrentPage,
     jobPost, setJobPost,
     resume, setResume,
     tailoredResume, setTailoredResume,
@@ -33,13 +31,21 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     tailoredSections, setTailoredSections
   } = useAppContext();
   
-  const navigation = [
-    { name: 'Job Post', action: () => setCurrentPage('Job Post') },
-    { name: 'Resume', action: () => setCurrentPage('Resume') },
-    { name: 'Editor', action: () => setCurrentPage('Editor') },
-    { name: 'Tailored Resume', action: () => setCurrentPage('Tailored Resume') },
-  ];
+  const navigation = useMemo(() => [
+    { name: 'Job Post', action: () => setCurrentPage('Job Post'), disabled: false },
+    { name: 'Resume', action: () => setCurrentPage('Resume'), disabled: !jobPost },
+    { name: 'Editor', action: () => setCurrentPage('Editor'), disabled: !jobPost || !resume },
+    { name: 'Tailored Resume', action: () => setCurrentPage('Tailored Resume'), disabled: !jobPost || !resume || !tailoredSections },
+  ], [jobPost, resume, tailoredSections, setCurrentPage]);
 
+  const currentPageIndex = navigation.findIndex(item => item.name === currentPage);
+  const generateRandomAvatar = () => {
+    const { user } = useAuthenticator((context) => [context.user]);
+    const generator = new AvatarGenerator();
+    return generator.generateRandomAvatar(user.username);
+  }
+  const avatar = generateRandomAvatar();
+  user.imageUrl = avatar;
   return (
     <div className="min-h-screen bg-secondary-50">
       <Disclosure as="nav" className="bg-primary-700 shadow-lg">
@@ -56,18 +62,24 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                     />
                   </div>
                   <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    {navigation.map((item) => (
+                    {navigation.map((item, index) => (
                       <a
                         key={item.name}
-                        onClick={item.action}
+                        onClick={() => !item.disabled && item.action()}
                         className={classNames(
                           item.name === currentPage
                             ? 'border-accent-500 text-white'
-                            : 'border-transparent text-primary-100 hover:border-primary-300 hover:text-white',
-                          'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium cursor-pointer transition duration-150 ease-in-out'
+                            : item.disabled
+                            ? 'border-transparent text-primary-300 cursor-not-allowed'
+                            : 'border-transparent text-primary-100 hover:border-primary-300 hover:text-white cursor-pointer',
+                          'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition duration-150 ease-in-out'
                         )}
                       >
+                        <span className="mr-2">{index + 1}.</span>
                         {item.name}
+                        {index < currentPageIndex && (
+                          <CheckCircleIcon className="ml-2 h-5 w-5 text-green-400" />
+                        )}
                       </a>
                     ))}
                   </div>
@@ -112,19 +124,25 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
 
             <DisclosurePanel className="sm:hidden">
               <div className="space-y-1 pb-3 pt-2">
-                {navigation.map((item) => (
+                {navigation.map((item, index) => (
                   <DisclosureButton
                     key={item.name}
                     as="a"
-                    onClick={() => item.action()}
+                    onClick={() => !item.disabled && item.action()}
                     className={classNames(
                       item.name === currentPage
                         ? 'bg-primary-800 border-accent-500 text-white'
-                        : 'border-transparent text-primary-100 hover:bg-primary-600 hover:border-primary-300 hover:text-white',
-                      'block border-l-4 py-2 pl-3 pr-4 text-base font-medium cursor-pointer transition duration-150 ease-in-out'
+                        : item.disabled
+                        ? 'border-transparent text-primary-300 cursor-not-allowed'
+                        : 'border-transparent text-primary-100 hover:bg-primary-600 hover:border-primary-300 hover:text-white cursor-pointer',
+                      'block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition duration-150 ease-in-out'
                     )}
                   >
+                    <span className="mr-2">{index + 1}.</span>
                     {item.name}
+                    {index < currentPageIndex && (
+                      <CheckCircleIcon className="ml-2 inline-block h-5 w-5 text-green-400" />
+                    )}
                   </DisclosureButton>
                 ))}
               </div>
@@ -156,7 +174,12 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
       <div className="py-10">
         <header>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* <h1 className="text-3xl font-bold leading-tight tracking-tight text-secondary-900">{currentPage}</h1> */}
+            <div className="h-2 w-full bg-gray-200 rounded-full mb-6">
+              <div
+                className="h-full bg-accent-500 rounded-full transition-all duration-300 ease-in-out"
+                style={{ width: `${((currentPageIndex + 1) / navigation.length) * 100}%` }}
+              ></div>
+            </div>
           </div>
         </header>
         <main>
