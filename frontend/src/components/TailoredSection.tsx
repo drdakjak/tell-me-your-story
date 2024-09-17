@@ -3,6 +3,12 @@ import { put } from '@aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 import ChatWindow from './ChatWindow';
 import DiffPopup from './DiffPopup';
+import { IoCheckbox } from "react-icons/io5";
+import { CiEdit } from "react-icons/ci";
+import { VscDiffMultiple } from "react-icons/vsc";
+import { TfiCheckBox } from "react-icons/tfi";
+import { LiaComments } from "react-icons/lia";
+import { FaEdit, FaSave, FaEye, FaComments } from 'react-icons/fa';
 
 interface SectionProps {
   section: any;
@@ -63,12 +69,6 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
             className="w-full p-2 border border-secondary-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out resize-vertical"
             rows={10}
           />
-          <button
-            onClick={handleSave}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
-          >
-            Save Changes
-          </button>
         </div>
       ) : (
         <div className="space-y-4">
@@ -81,24 +81,37 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
         </div>
       )}
 
-      <div className="flex space-x-2">
-        <button
-          onClick={handleIsEditing}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
-        >
-          Edit
-        </button>
+      <div className="flex space-x-2 justify-center">
+        {isEditing ? (
+          <button
+            onClick={handleSave}
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-400 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
+            title="Save Changes"
+          >
+            <TfiCheckBox className="w-5 h-5" />
+          </button>
+        ) : (
+          <button
+            onClick={handleIsEditing}
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"            
+            title="Edit"
+          >
+            <CiEdit className="w-5 h-5" />
+          </button>
+        )}
         <button
           onClick={toggleDiffPopup}
           className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 transition duration-150 ease-in-out"
+          title="View Diff"
         >
-          View Diff
+          <VscDiffMultiple className="w-5 h-5" />
         </button>
         <button
           onClick={handleOpenChat}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
+          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+          title="Open Chat"
         >
-          Open Chat
+          <LiaComments className="w-5 h-5" />
         </button>
       </div>
 

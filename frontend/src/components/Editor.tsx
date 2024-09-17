@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { post } from '@aws-amplify/api';
 import Render from './SectionsRender';
 
@@ -48,22 +48,15 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
         }
     };
 
+    useEffect(() => {
+        console.log('tailoredSections:', tailoredSections);
+        if (!tailoredSections.length) {
+            optimiseResume();
+        }
+    }, [tailoredSections]);
+
     return (
         <div className="space-y-6">
-            <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                <div className="px-4 py-5 sm:p-6">
-                    <h2 className="text-2xl font-bold text-secondary-900 mb-4">Resume Editor</h2>
-                    <p className="text-secondary-600 mb-6">Click the button below to tailor your resume based on the job post and your original resume.</p>
-                    <button
-                        onClick={optimiseResume}
-                        disabled={isLoading}
-                        className="bg-accent-500 text-white px-6 py-3 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? 'Tailoring...' : 'Tailor Resume'}
-                    </button>
-                </div>
-            </div>
-
             {isLoading && (
                 <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>

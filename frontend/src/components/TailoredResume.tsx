@@ -64,7 +64,6 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
       {tailoredResume && (
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
-            <h2 className="text-2xl font-bold text-secondary-900 mb-6">Your Tailored Resume</h2>
             <div className="prose max-w-none">
               <Markdown>{tailoredResume}</Markdown>
             </div>
