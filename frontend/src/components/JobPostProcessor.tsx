@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { post } from 'aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 
-const JobPostProcessor: React.FC = () => {
+interface JobPostProcessorProps {
+  jobPost: string;
+  setJobPost: (jobPost: string) => void;
+}
+
+const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [jobPost, setJobPost] = useState('');
   const [analyzedJobPost, setAnalyzedJobPost] = useState('');
 
-  const FetchJobPost = async () => {
+  const fetchJobPost = async () => {
     setIsLoading(true);
     setError('');
     try {
@@ -67,7 +71,7 @@ const JobPostProcessor: React.FC = () => {
             placeholder="https://example.com/job-post"
           />
           <button
-            onClick={FetchJobPost}
+            onClick={fetchJobPost}
             disabled={isLoading}
             className="bg-indigo-600 text-white px-4 py-2 rounded-r-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >

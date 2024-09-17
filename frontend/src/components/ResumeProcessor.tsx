@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { post } from 'aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 
-const ResumeProcessor: React.FC = () => {
+interface ResumeProcessorProps {
+  resume: string;
+  setResume: (resume: string) => void;
+}
+
+const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [resume, setResume] = useState([]);
-  const [analyzedResume, setAnalyzedResume] = useState('');
+  const [analyzedResume, setAnalyzedResume] = useState<any[]>([]);
 
-  const FetchResume = async () => {
+  const fetchResume = async () => {
     setIsLoading(true);
     setError('');
     try {
@@ -65,7 +69,7 @@ const ResumeProcessor: React.FC = () => {
             placeholder="https://example.com/resume"
           />
           <button
-            onClick={FetchResume}
+            onClick={fetchResume}
             disabled={isLoading}
             className="bg-indigo-600 text-white px-4 py-2 rounded-r-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
@@ -101,10 +105,10 @@ const ResumeProcessor: React.FC = () => {
       {isLoading && <p className="text-gray-600">Loading...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
-      {analyzedResume && (
+      {analyzedResume.length > 0 && (
         <div>
-          {analyzedResume.map((item) => (
-            <div className="mt-6" key={item.name}>
+          {analyzedResume.map((item, index) => (
+            <div className="mt-6" key={index}>
               <ReactMarkdown>{item.header}</ReactMarkdown>
               <ReactMarkdown>{item.content}</ReactMarkdown>
             </div>

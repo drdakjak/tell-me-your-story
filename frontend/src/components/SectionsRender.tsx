@@ -4,20 +4,9 @@ import TailoredSection from './TailoredSection';
 import AdvicePopup from './AdvicePopup';
 import { FaLightbulb } from 'react-icons/fa';
 
-interface OriginalSectionInterface {
-  header: string;
-  content: string;
-  section_id: string;
-}
-
-interface TailoredSectionInterface {
-  advice: string;
-  tailored_section: OriginalSectionInterface;
-}
-
 interface RenderProps {
-  originalSections: OriginalSectionInterface[];
-  tailoredSections: TailoredSectionInterface[];
+  originalSections: any[];
+  tailoredSections: any[];
 }
 
 const Render: React.FC<RenderProps> = ({

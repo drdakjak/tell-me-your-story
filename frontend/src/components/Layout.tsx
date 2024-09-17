@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import JobPostProcessor from './JobPostProcessor';
@@ -6,8 +6,6 @@ import ResumeProcessor from './ResumeProcessor';
 import TailoredResume from './TailoredResume';
 import Editor from './Editor';
 import { useAppContext } from './AppContext';
-
-
 
 const user = {
   name: 'Tom Cook',
@@ -26,9 +24,15 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
+const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
+  const { currentPage, setCurrentPage,
+    jobPost, setJobPost,
+    resume, setResume,
+    tailoredResume, setTailoredResume,
+    originalSections, setOriginalSections,
+    tailoredSections, setTailoredSections
 
-const Layout: React.FC = ({ signOut }) => {
-  const { currentPage, setCurrentPage } = useAppContext();
+  } = useAppContext();
   const navigation = [
     { name: 'Job Post', action: () => setCurrentPage('Job Post') },
     { name: 'Resume', action: () => setCurrentPage('Resume') },
@@ -38,9 +42,6 @@ const Layout: React.FC = ({ signOut }) => {
 
   const handleNavigation = (pageName: string) => {
     setCurrentPage(pageName);
-    navigation.forEach(item => {
-      item.current = item.name === pageName;
-    });
   };
 
   return (
@@ -62,11 +63,10 @@ const Layout: React.FC = ({ signOut }) => {
                     {navigation.map((item) => (
                       <a
                         key={item.name}
-                        href={item.href}
-                        onClick={() => handleNavigation(item.name)}
-                        aria-current={item.current ? 'page' : undefined}
+                        onClick={item.action}
+                        aria-current={item.name === currentPage ? 'page' : undefined}
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          item.name === currentPage ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'rounded-md px-3 py-2 text-sm font-medium',
                         )}
                       >
@@ -130,11 +130,10 @@ const Layout: React.FC = ({ signOut }) => {
                 <DisclosureButton
                   key={item.name}
                   as="a"
-                  href={item.href}
-                  onClick={() => handleNavigation(item.name)}
-                  aria-current={item.current ? 'page' : undefined}
+                  onClick={() => item.action}
+                  aria-current={item.name === currentPage ? 'page' : undefined}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    item.name === currentPage ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block rounded-md px-3 py-2 text-base font-medium',
                   )}
                 >
@@ -187,14 +186,20 @@ const Layout: React.FC = ({ signOut }) => {
         <main>
           {/* Page routing and content */}
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {currentPage === 'Editor' && <Editor />}
-            {currentPage === 'Job Post' && <JobPostProcessor />}
-            {currentPage === 'Resume' && <ResumeProcessor />}
-            {currentPage === 'Tailored Resume' && <TailoredResume />}
+            {currentPage === 'Editor' && <Editor
+              originalSections={originalSections}
+              setOriginalSections={setOriginalSections}
+              tailoredSections={tailoredSections}
+              setTailoredSections={setTailoredSections}
+            />}
+            {currentPage === 'Job Post' && <JobPostProcessor jobPost={jobPost} setJobPost={setJobPost} />}
+            {currentPage === 'Resume' && <ResumeProcessor resume={resume} setResume={setResume} />}
+            {currentPage === 'Tailored Resume' && <TailoredResume tailoredResume={tailoredResume} setTailoredResume={setTailoredResume} />}
           </div>
         </main>
       </div>
     </>
   );
 };
+
 export default Layout;

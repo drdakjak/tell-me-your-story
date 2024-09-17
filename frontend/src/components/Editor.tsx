@@ -11,12 +11,20 @@ interface Section {
 
 interface TailoredSection {
     advice: string;
-    tailored_section: Section;
+    header: string;
+    content: string;
+    section_id: string;
 }
 
-const Editor: React.FC = () => {
-    const [originalSections, setOriginalSections] = useState<Section[]>([]);
-    const [tailoredSections, setTailoredSections] = useState<TailoredSection[]>([]);
+interface EditorProps {
+    originalSections: Section[];
+    setOriginalSections: (originalSections: Section[]) => void;
+    tailoredSections: TailoredSection[];
+    setTailoredSections: (tailoredSections: TailoredSection[]) => void;
+}
+
+
+const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, tailoredSections, setTailoredSections }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [showTailoredResume, setShowTailoredResume] = useState(false);
