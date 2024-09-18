@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import { post } from 'aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
-
+import { ToggleSwitch } from "flowbite-react";
+import { GrLinkNext } from "react-icons/gr";
+import { Spinner } from "flowbite-react";
+import { PiCpuThin } from "react-icons/pi";
+import { Accordion } from "flowbite-react";
+import FileUpload from './FileUpload';
+import { IoCloudUploadOutline } from "react-icons/io5"
 interface ResumeProcessorProps {
   resume: string;
   setResume: (resume: string) => void;
+  setCurrentPage: (page: string) => void;
 }
 
-const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume }) => {
+const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, setCurrentPage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [analyzedResume, setAnalyzedResume] = useState<any[]>([]);
+  const [analyzedResume, setAnalyzedResume] = useState('');
+  const [isUrlInput, setIsUrlInput] = useState(true);
 
   const fetchResume = async () => {
     setIsLoading(true);
@@ -19,12 +27,13 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume }) 
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch resume');
+        throw new Error('Failed to fetch job post');
       }
       const text = await response.text();
       setResume(text);
+      setIsUrlInput(false); // Switch to textarea after fetching
     } catch (err) {
-      setError('Error fetching resume. Please check the URL and try again.');
+      setError('Error fetching job post. Please check the URL and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +53,8 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume }) 
 
       const { body } = await restOperation.response;
       const response = await body.json();
-      setAnalyzedResume(response);
 
+      setAnalyzedResume(response);
     } catch (err) {
       setError('Error analyzing resume. Please try again.');
     } finally {
@@ -53,58 +62,59 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume }) 
     }
   };
 
+  const toggleInputType = () => {
+    setIsUrlInput(!isUrlInput);
+    setResume(resume);
+    setUrl(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
         <div className="px-4 py-5 sm:p-6">
-          <label htmlFor="url-input" className="block text-sm font-medium text-secondary-700 mb-2">
-            Resume URL
-          </label>
-          <div className="flex">
-            <input
-              type="text"
-              id="url-input"
-              className="flex-grow px-3 py-2 border border-secondary-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/resume"
+          <div className="flex justify-between items-center mb-4">
+            <ToggleSwitch
+              checked={!isUrlInput}
+              onChange={toggleInputType}
+              label={isUrlInput ? 'Text Input' : 'File upload'}
             />
-            <button
-              onClick={fetchResume}
-              disabled={isLoading}
-              className="bg-primary-600 text-white px-4 py-2 rounded-r-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+          </div>
+          {isUrlInput ? (
+            <div className="">
+              <FileUpload />
+              <div className="flex justify-end">
+              <button
+                onClick={fetchResume}
+                disabled={isLoading}
+                className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
+              >
+                {isLoading ? 'Processing...' : <IoCloudUploadOutline className="animate-pulse h-7 w-7"></IoCloudUploadOutline>}
+              </button>
+              </div>
+            </div>
+          ) : (
+            <textarea
+              rows={10}
+              className="w-full px-3 py-2 border border-secondary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
+              value={resume}
+              onChange={(e) => setResume(e.target.value)}
+              placeholder="Paste resume here"
+            ></textarea>
+          )}
+          <div className="flex justify-end">
+            {resume && (<button
+              onClick={analyzeResume}
+              disabled={isLoading || (!resume && !url)}
+              title="Analyze"
+              className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
             >
-              {isLoading ? 'Fetching...' : 'Fetch'}
-            </button>
+              {isLoading ? <Spinner className="h-7 w-7"></Spinner> : <PiCpuThin className="animate-pulse h-7 w-7" />}
+            </button>)}
           </div>
         </div>
+
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="px-4 py-5 sm:p-6">
-          <label htmlFor="resume" className="block text-sm font-medium text-secondary-700 mb-2">
-            Resume
-          </label>
-          <textarea
-            id="resume"
-            rows={10}
-            className="w-full px-3 py-2 border border-secondary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
-            value={resume}
-            onChange={(e) => setResume(e.target.value)}
-            placeholder="Paste or enter resume here"
-          ></textarea>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          onClick={analyzeResume}
-          disabled={isLoading || !resume}
-          className="bg-accent-500 text-white px-6 py-3 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
-        >
-          {isLoading ? 'Processing...' : 'Process Resume'}
-        </button>
-      </div>
 
       {error && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
@@ -121,21 +131,29 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume }) 
         </div>
       )}
 
-      {analyzedResume.length > 0 && (
+      {analyzedResume && (
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-secondary-900 mb-4">Analyzed Resume</h3>
-            <div className="space-y-4">
-              {analyzedResume.map((item, index) => (
-                <div key={index} className="border-b border-secondary-200 pb-4 last:border-b-0 last:pb-0">
-                  <h4 className="text-md font-semibold text-secondary-700 mb-2">
-                    <ReactMarkdown>{item.header}</ReactMarkdown>
-                  </h4>
-                  <div className="prose max-w-none text-secondary-600">
-                    <ReactMarkdown>{item.content}</ReactMarkdown>
-                  </div>
-                </div>
+            <Accordion collapseAll>
+              {analyzedResume.map((section, index) => (
+                <Accordion.Panel key={index}>
+                  <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">{section.header}</Accordion.Title>
+                  <Accordion.Content>
+                    <div className="">
+                      <ReactMarkdown className="text-pretty">{section.content}</ReactMarkdown>
+                    </div>
+                  </Accordion.Content>
+                </Accordion.Panel>
               ))}
+            </Accordion>
+            <div className="flex justify-center items-center">
+              <button
+                onClick={() => setCurrentPage("Editor")}
+                title="Editor "
+                className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
+              >
+                <GrLinkNext className='animate-pulse h-7 w-7'></GrLinkNext>
+              </button>
             </div>
           </div>
         </div>

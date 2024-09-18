@@ -13,10 +13,12 @@ Bellow, you have access to:
 
 
 IMPORTANT: You MUST respond ONLY in the following JSON format:
-```json
+
+{{
     "text": "Any other text except the modified tailored section.",
     "tailored_section": "Updated resume section if changes are needed. Leave empty string if no update is required."
-```
+}}
+
 The response MUST contain keys "text" and "tailored_section".
 
 --------------------------------------------

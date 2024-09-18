@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { post } from '@aws-amplify/api';
 import Render from './SectionsRender';
+import { GrLinkNext } from "react-icons/gr";
+import { Spinner } from "flowbite-react";
 
 interface Section {
     header: string;
@@ -20,9 +22,10 @@ interface EditorProps {
     setOriginalSections: (originalSections: Section[]) => void;
     tailoredSections: TailoredSection[];
     setTailoredSections: (tailoredSections: TailoredSection[]) => void;
+    setCurrentPage: (currentPage: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, tailoredSections, setTailoredSections }) => {
+const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, tailoredSections, setTailoredSections, setCurrentPage }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -59,7 +62,7 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
         <div className="space-y-6">
             {isLoading && (
                 <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                        <Spinner className="h-7 w-7"></Spinner>
                 </div>
             )}
 
@@ -86,7 +89,17 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
                             tailoredSections={tailoredSections}
                         />
                     </div>
+                    <div className="flex justify-center items-center">
+                        <button
+                            onClick={() => setCurrentPage("Tailored Resume")}
+                            title="Tailored Resume"
+                            className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
+                        >
+                            <GrLinkNext className='animate-pulse h-7 w-7'></GrLinkNext>
+                        </button>
+                    </div>
                 </div>
+
             )}
 
             {!isLoading && !error && originalSections.length === 0 && tailoredSections.length === 0 && (

@@ -8,7 +8,10 @@ import Editor from './Editor';
 import { useAppContext } from './AppContext';
 import { AvatarGenerator } from 'random-avatar-generator';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-
+import { PiBriefcaseLight, PiUserCircleThin, PiClipboardTextLight} from "react-icons/pi";
+import { HiAdjustmentsVertical} from "react-icons/hi2";
+import { GrFormNext } from "react-icons/gr";
+import avatar from 'animal-avatar-generator'
 
 const user = {
   name: 'Tom Cook',
@@ -32,20 +35,21 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
   } = useAppContext();
   
   const navigation = useMemo(() => [
-    { name: 'Job Post', action: () => setCurrentPage('Job Post'), disabled: false },
-    { name: 'Resume', action: () => setCurrentPage('Resume'), disabled: !jobPost },
-    { name: 'Editor', action: () => setCurrentPage('Editor'), disabled: !jobPost || !resume },
-    { name: 'Tailored Resume', action: () => setCurrentPage('Tailored Resume'), disabled: !jobPost || !resume || !tailoredSections },
+    { name: 'Job Post', icon: PiBriefcaseLight, action: () => setCurrentPage('Job Post'), disabled: false },
+    { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !jobPost },
+    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => setCurrentPage('Editor'), disabled: !resume },
+    { name: 'Tailored Resume', icon: PiClipboardTextLight, action: () => setCurrentPage('Tailored Resume'), disabled: !jobPost || !resume || !tailoredSections },
   ], [jobPost, resume, tailoredSections, setCurrentPage]);
 
   const currentPageIndex = navigation.findIndex(item => item.name === currentPage);
   const generateRandomAvatar = () => {
+
     const { user } = useAuthenticator((context) => [context.user]);
-    const generator = new AvatarGenerator();
-    return generator.generateRandomAvatar(user.username);
+    const avatar_svg = avatar(user.username, { size: 200 })
+    return avatar_svg;
   }
-  const avatar = generateRandomAvatar();
-  user.imageUrl = avatar;
+  user.imageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(generateRandomAvatar())}`
+
   return (
     <div className="min-h-screen bg-secondary-50">
       <Disclosure as="nav" className="bg-primary-700 shadow-lg">
@@ -56,6 +60,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                 <div className="flex">
                   <div className="flex flex-shrink-0 items-center">
                     <img
+                    // TODO: Replace with your company logo
                       className="h-8 w-auto"
                       src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                       alt="Your Company"
@@ -76,10 +81,15 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                         )}
                       >
                         <span className="mr-2">{index + 1}.</span>
+                        {item.icon && <item.icon className="h-5 w-5 mr-1" />}
                         {item.name}
-                        {index < currentPageIndex && (
+                        {/* {index < currentPageIndex && (
                           <CheckCircleIcon className="ml-2 h-5 w-5 text-green-400" />
+                        )} */}
+                        {index < navigation.length - 1 && (
+                        <GrFormNext className="ml-8"></GrFormNext>
                         )}
+                        
                       </a>
                     ))}
                   </div>
@@ -187,15 +197,16 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
             <div className="px-4 py-8 sm:px-0">
               <div className="rounded-lg bg-white shadow">
                 <div className="px-4 py-5 sm:p-6">
+                  {currentPage === 'Job Post' && <JobPostProcessor jobPost={jobPost} setJobPost={setJobPost} setCurrentPage={setCurrentPage}/>}
+                  {currentPage === 'Resume' && <ResumeProcessor resume={resume} setResume={setResume} setCurrentPage={setCurrentPage}/>}
                   {currentPage === 'Editor' && <Editor
                     originalSections={originalSections}
                     setOriginalSections={setOriginalSections}
                     tailoredSections={tailoredSections}
                     setTailoredSections={setTailoredSections}
+                    setCurrentPage={setCurrentPage}
                   />}
-                  {currentPage === 'Job Post' && <JobPostProcessor jobPost={jobPost} setJobPost={setJobPost} />}
-                  {currentPage === 'Resume' && <ResumeProcessor resume={resume} setResume={setResume} />}
-                  {currentPage === 'Tailored Resume' && <TailoredResume tailoredResume={tailoredResume} setTailoredResume={setTailoredResume} />}
+                  {currentPage === 'Tailored Resume' && <TailoredResume tailoredResume={tailoredResume} setTailoredResume={setTailoredResume} setCurrentPage={setCurrentPage}/>}
                 </div>
               </div>
             </div>

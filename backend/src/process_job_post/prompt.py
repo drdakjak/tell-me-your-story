@@ -16,5 +16,5 @@ Important: When extracting requirements, pay special attention to disjunctive re
 "Bachelor's degree in Computer Science or related field" should be listed as one requirement.
 "5+ years of experience with Java or C++" should be treated as a single requirement.
 
-Return the text in Markdown format.
+Return the text in Markdown without any unnecessary tags.
 """

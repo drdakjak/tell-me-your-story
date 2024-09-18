@@ -67,7 +67,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           }
         }
       }).response;
+      console.log(body);
       const response = await body.json();
+      console.log(response);
       response.map((message: any) => {
         if (message.type === 'ai' && message.content) {
           const content = JSON.parse(message.content)
@@ -111,6 +113,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setMessages([...messages, newMessage]);
       setInputMessage('');
       setIsWaiting(true);
+      console.log("section.originalSection.section_id", section.originalSection.section_id);
+      console.log("section.tailoredSection.content", section.tailoredSection.content);
+      console.log(inputMessage);
 
       try {
         const { body } = await post({
@@ -125,8 +130,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             }
           }
         }).response;
+        console.log(body);
         let response = await body.json();
-
+        console.log(response);
         const botResponse: Message = {
           type: 'ai',
           content: formatAIResponse(response)

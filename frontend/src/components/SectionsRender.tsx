@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import TailoredSection from './TailoredSection';
 import AdvicePopup from './AdvicePopup';
-import { FaLightbulb } from 'react-icons/fa';
 import { MdOutlineFeedback } from "react-icons/md";
+import { Accordion } from "flowbite-react";
 
 interface RenderProps {
   originalSections: any[];
@@ -63,30 +63,39 @@ const Render: React.FC<RenderProps> = ({
       </div>
 
       <div className={`space-y-8 ${isDesktopView ? 'md:space-y-12' : ''}`}>
-        {sections.map((section, index) => (
-          <div key={index} className={`bg-white shadow-sm rounded-lg overflow-hidden ${isDesktopView ? 'md:flex' : ''}`}>
-            <div className={`space-y-4 p-6 ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-secondary-900">
-                  <ReactMarkdown>{section.originalSection.header}</ReactMarkdown>
-                </h3>
-                <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
-                  <ReactMarkdown>{section.originalSection.content}</ReactMarkdown>
+        <Accordion>
+          {sections.map((section, index) => (
+            <Accordion.Panel key={index}>
+              <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">{section.originalSection.header}</Accordion.Title>
+              <Accordion.Content>
+                <div key={index} className={`bg-white shadow-sm rounded-lg overflow-hidden ${isDesktopView ? 'md:flex' : ''}`}>
+                  <div className={`space-y-4 p-6 ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-secondary-900">
+                        <ReactMarkdown>{section.originalSection.header}</ReactMarkdown>
+                      </h3>
+                      <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
+                        <ReactMarkdown>{section.originalSection.content}</ReactMarkdown>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 justify-center">
+                      <button
+                        onClick={() => openAdvicePopup(index)}
+                        className=" px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
+                        title="View Advice"
+                      >
+                        <MdOutlineFeedback className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className={`p-6 ${isDesktopView ? 'md:w-1/2' : ''}`}>
+                    <TailoredSection section={section} />
+                  </div>
                 </div>
-              </div>
-              <button
-                onClick={() => openAdvicePopup(index)}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
-                title="View Advice"
-              >
-                <MdOutlineFeedback className="h-5 w-5" />
-              </button>
-            </div>
-            <div className={`p-6 ${isDesktopView ? 'md:w-1/2' : ''}`}>
-              <TailoredSection section={section} />
-            </div>
-          </div>
-        ))}
+              </Accordion.Content>
+            </Accordion.Panel>
+          ))}
+        </Accordion>
       </div>
 
       {showAdvicePopup !== null && (

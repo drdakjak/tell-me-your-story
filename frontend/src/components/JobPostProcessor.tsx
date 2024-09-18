@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import { post } from 'aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
-
+import { ToggleSwitch } from "flowbite-react";
+import { GrLinkNext } from "react-icons/gr";
+import { Spinner } from "flowbite-react";
+import { PiCpuThin } from "react-icons/pi";
+import { Accordion } from "flowbite-react";
 interface JobPostProcessorProps {
   jobPost: string;
   setJobPost: (jobPost: string) => void;
+  setCurrentPage: (page: string) => void;
 }
 
-const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost }) => {
+const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost, setCurrentPage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
   const [analyzedJobPost, setAnalyzedJobPost] = useState('');
+  const [isUrlInput, setIsUrlInput] = useState(true);
 
   const fetchJobPost = async () => {
     setIsLoading(true);
@@ -23,6 +29,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
       }
       const text = await response.text();
       setJobPost(text);
+      setIsUrlInput(false); // Switch to textarea after fetching
     } catch (err) {
       setError('Error fetching job post. Please check the URL and try again.');
     } finally {
@@ -46,7 +53,6 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
       const response = await body.json();
 
       setAnalyzedJobPost(response);
-
     } catch (err) {
       setError('Error analyzing job post. Please try again.');
     } finally {
@@ -54,58 +60,63 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
     }
   };
 
+  const toggleInputType = () => {
+    setIsUrlInput(!isUrlInput);
+    setJobPost(jobPost);
+    setUrl(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
         <div className="px-4 py-5 sm:p-6">
-          <label htmlFor="url-input" className="block text-sm font-medium text-secondary-700 mb-2">
-            Job Post URL
-          </label>
-          <div className="flex">
-            <input
-              type="text"
-              id="url-input"
-              className="flex-grow px-3 py-2 border border-secondary-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/job-post"
+          <div className="flex justify-between items-center mb-4">
+            <ToggleSwitch
+              checked={!isUrlInput}
+              onChange={toggleInputType}
+              label={isUrlInput ? 'Text Input' : 'URL Input'}
             />
-            <button
-              onClick={fetchJobPost}
-              disabled={isLoading}
-              className="bg-primary-600 text-white px-4 py-2 rounded-r-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+          </div>
+          {isUrlInput ? (
+            <div className="flex">
+              <input
+                type="text"
+                className="flex-grow px-3 py-2 border border-secondary-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Paste url here e.g.: https://example.com/job-post"
+              />
+              <button
+                onClick={fetchJobPost}
+                disabled={isLoading}
+                className="bg-primary-600 text-white px-4 py-2 rounded-r-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+              >
+                {isLoading ? 'Fetching...' : 'Fetch'}
+              </button>
+            </div>
+          ) : (
+            <textarea
+              rows={10}
+              className="w-full px-3 py-2 border border-secondary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
+              value={jobPost}
+              onChange={(e) => setJobPost(e.target.value)}
+              placeholder="Paste job post here"
+            ></textarea>
+          )}
+          <div className="flex justify-end">
+            {jobPost && !isUrlInput && (<button
+              onClick={analyzeJobPost}
+              disabled={isLoading || (!jobPost && !url)}
+              title="Analyze"
+              className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
             >
-              {isLoading ? 'Fetching...' : 'Fetch'}
-            </button>
+              {isLoading ? <Spinner className="h-7 w-7"></Spinner> : <PiCpuThin className="animate-pulse h-7 w-7" />}
+            </button>)}
           </div>
         </div>
+
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="px-4 py-5 sm:p-6">
-          <label htmlFor="job-post" className="block text-sm font-medium text-secondary-700 mb-2">
-            Job Post
-          </label>
-          <textarea
-            id="job-post"
-            rows={10}
-            className="w-full px-3 py-2 border border-secondary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
-            value={jobPost}
-            onChange={(e) => setJobPost(e.target.value)}
-            placeholder="Paste or enter job post here"
-          ></textarea>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          onClick={analyzeJobPost}
-          disabled={isLoading || !jobPost}
-          className="bg-accent-500 text-white px-6 py-3 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
-        >
-          {isLoading ? 'Processing...' : 'Process Job Post'}
-        </button>
-      </div>
 
       {error && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
@@ -125,9 +136,24 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
       {analyzedJobPost && (
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-secondary-900 mb-4">Analyzed Job Post</h3>
-            <div className="prose max-w-none">
-              <ReactMarkdown>{analyzedJobPost}</ReactMarkdown>
+            <Accordion collapseAll>
+              <Accordion.Panel>
+                <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">Analyzed Job Post</Accordion.Title>
+                <Accordion.Content>
+                  <div className="">
+                    <ReactMarkdown className="text-pretty">{analyzedJobPost}</ReactMarkdown>
+                  </div>
+                </Accordion.Content>
+              </Accordion.Panel>
+            </Accordion>
+            <div className="flex justify-center items-center">
+              <button
+                onClick={() => setCurrentPage("Resume")}
+                title="Resume"
+                className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
+              >
+                <GrLinkNext className='animate-pulse h-7 w-7'></GrLinkNext>
+              </button>
             </div>
           </div>
         </div>

@@ -70,17 +70,17 @@ def handler(event, context):
         llm_with_tools = llm.bind_tools(tools)
 
         parser = JsonOutputParser()
-        system_prompt = INIT_PROMPT.format(
+
+        prompt = ChatPromptTemplate(
+            messages=[
+                ("system", INIT_PROMPT),
+                MessagesPlaceholder(variable_name="history"),
+                ("user", "{user_message}"),
+            ],
+        ).partial(
             original_section=original_section,
             tailored_section=tailored_section,
             job_requirements=job_requirements,
-        )
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", system_prompt),
-                MessagesPlaceholder(variable_name="history"),
-                ("user", "{user_message}"),
-            ]
         )
 
         chain = prompt | llm_with_tools
@@ -105,7 +105,11 @@ def handler(event, context):
                 tool_msg = selected_tool.invoke(tool_call)
                 history = get_message_history(conversation_id)
                 history.add_message(tool_msg)
-
+            system_prompt = INIT_PROMPT.format(
+                original_section=original_section,
+                tailored_section=tailored_section,
+                job_requirements=job_requirements,
+            )
             messages = [SystemMessage(content=system_prompt), *history.messages]
             response = llm_with_tools.invoke(messages)
             history.add_message(response)
