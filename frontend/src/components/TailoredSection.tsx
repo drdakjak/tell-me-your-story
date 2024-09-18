@@ -85,7 +85,7 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
         {isEditing ? (
           <button
             onClick={handleSave}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-400 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
             title="Save Changes"
           >
             <TfiCheckBox className="w-5 h-5" />
@@ -101,7 +101,7 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
         )}
         <button
           onClick={toggleDiffPopup}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 transition duration-150 ease-in-out"
+          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 transition duration-150 ease-in-out"
           title="View Diff"
         >
           <VscDiffMultiple className="w-5 h-5" />
