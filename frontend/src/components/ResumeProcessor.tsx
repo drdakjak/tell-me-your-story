@@ -102,7 +102,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
             ></textarea>
           )}
           <div className="flex justify-end">
-            {resume && (<button
+            {resume && !isUrlInput && (<button
               onClick={analyzeResume}
               disabled={isLoading || (!resume && !url)}
               title="Analyze"

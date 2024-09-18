@@ -1,4 +1,5 @@
 import React from 'react';
+import { PiDownloadSimpleLight } from "react-icons/pi";
 
 interface ResumeExporterProps {
   textToDownload: string;
@@ -19,12 +20,13 @@ const ResumeExporter: React.FC<ResumeExporterProps> = ({ textToDownload }) => {
   };
 
   return (
-    <div>
+    <div className="flex justify-center">
       <button
         onClick={handleDownload}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        title="Dowload"
       >
-        Download Resume
+      <PiDownloadSimpleLight className="animate-pulse w-7 h-7" />
       </button>
     </div>
   );

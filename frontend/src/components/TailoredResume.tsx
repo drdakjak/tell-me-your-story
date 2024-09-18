@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { get } from 'aws-amplify/api';
 import Markdown from 'react-markdown';
 import ResumeExporter from './ResumeExporter';
+import { Spinner } from "flowbite-react";
 
 interface TailoredResumeProps {
   tailoredResume: string;
@@ -42,7 +43,7 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
     <div className="space-y-6">
       {isLoading && (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+          <Spinner className="h-7 w-7"></Spinner>
         </div>
       )}
       

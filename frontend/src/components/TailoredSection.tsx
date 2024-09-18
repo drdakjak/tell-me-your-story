@@ -3,12 +3,10 @@ import { put } from '@aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 import ChatWindow from './ChatWindow';
 import DiffPopup from './DiffPopup';
-import { IoCheckbox } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
 import { VscDiffMultiple } from "react-icons/vsc";
 import { TfiCheckBox } from "react-icons/tfi";
 import { LiaComments } from "react-icons/lia";
-import { FaEdit, FaSave, FaEye, FaComments } from 'react-icons/fa';
 
 interface SectionProps {
   section: any;

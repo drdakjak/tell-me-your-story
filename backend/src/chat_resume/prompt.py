@@ -7,7 +7,7 @@ INIT_PROMPT = """You're an expert resume writer. Your task is to:
 
 Bellow, you have access to:
 1. Original Section: The original unmodified resume section.
-2. Tailored Section: The current tailored version (if any).
+2. Original Tailored Section: The accepted tailored version by user.
 3. Job Requirements: Extracted from the job post.
 4. The whole resume provided by the user by calling a function.
 
@@ -27,7 +27,7 @@ The response MUST contain keys "text" and "tailored_section".
 Original Section:
 {original_section}
 
-Tailored Section:
+Original Tailored Section:
 {tailored_section}
 
 Job Requirements:
