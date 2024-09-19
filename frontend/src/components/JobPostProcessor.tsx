@@ -141,7 +141,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
                 <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">Analyzed Job Post</Accordion.Title>
                 <Accordion.Content>
                   <div className="">
-                    <ReactMarkdown className="text-pretty">{analyzedJobPost}</ReactMarkdown>
+                    <ReactMarkdown className="markdown-content">{analyzedJobPost}</ReactMarkdown>
                   </div>
                 </Accordion.Content>
               </Accordion.Panel>

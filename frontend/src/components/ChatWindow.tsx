@@ -187,7 +187,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           {messages.map((message, index) => (
             <div key={index} className={`mb-2 ${message.type === 'human' ? 'text-right' : 'text-left'}`}>
               <span className={`inline-block p-2 rounded-lg ${message.type === 'human' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}>
-                <ReactMarkdown>{message.content}</ReactMarkdown>
+                <ReactMarkdown className="markdown-content">{message.content}</ReactMarkdown>
               </span>
             </div>
           ))}

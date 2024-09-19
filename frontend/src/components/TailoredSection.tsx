@@ -71,10 +71,10 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
       ) : (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-secondary-900">
-            <ReactMarkdown>{section.tailoredSection.header}</ReactMarkdown>
+            <ReactMarkdown className="markdown-content">{section.tailoredSection.header}</ReactMarkdown>
           </h3>
           <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
-            <ReactMarkdown>{section.tailoredSection.content}</ReactMarkdown>
+            <ReactMarkdown className="markdown-content">{section.tailoredSection.content}</ReactMarkdown>
           </div>
         </div>
       )}

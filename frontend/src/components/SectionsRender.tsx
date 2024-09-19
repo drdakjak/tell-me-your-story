@@ -71,17 +71,17 @@ const Render: React.FC<RenderProps> = ({
                 <div key={index} className={`bg-white shadow-sm rounded-lg overflow-hidden ${isDesktopView ? 'md:flex' : ''}`}>
                   <div className={`space-y-4 p-6 ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-secondary-900">
-                        <ReactMarkdown>{section.originalSection.header}</ReactMarkdown>
+                      <h3 className="text-xl font-bold text-secondary-900">
+                        <ReactMarkdown className="markdown-header">{section.originalSection.header}</ReactMarkdown>
                       </h3>
                       <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
-                        <ReactMarkdown>{section.originalSection.content}</ReactMarkdown>
+                        <ReactMarkdown className="markdown-content">{section.originalSection.content}</ReactMarkdown>
                       </div>
                     </div>
                     <div className="flex space-x-2 justify-center">
                       <button
                         onClick={() => openAdvicePopup(index)}
-                        className=" px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
+                        className="px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
                         title="View Advice"
                       >
                         <MdOutlineFeedback className="h-5 w-5" />

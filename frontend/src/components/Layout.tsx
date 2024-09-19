@@ -6,18 +6,19 @@ import ResumeProcessor from './ResumeProcessor';
 import TailoredResume from './TailoredResume';
 import Editor from './Editor';
 import { useAppContext } from './AppContext';
-import { AvatarGenerator } from 'random-avatar-generator';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { PiBriefcaseLight, PiUserCircleThin, PiClipboardTextLight} from "react-icons/pi";
 import { HiAdjustmentsVertical} from "react-icons/hi2";
 import { GrFormNext } from "react-icons/gr";
 import avatar from 'animal-avatar-generator'
+import { PiCircleNotch } from "react-icons/pi";
+import { PiCircleNotchFill } from "react-icons/pi";
+
 
 const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+  name: '',
+  email: '',
+  imageUrl: '',
 }
 
 function classNames(...classes: string[]) {
@@ -59,12 +60,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
               <div className="flex h-16 justify-between">
                 <div className="flex">
                   <div className="flex flex-shrink-0 items-center">
-                    <img
-                    // TODO: Replace with your company logo
-                      className="h-8 w-auto"
-                      src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                      alt="Your Company"
-                    />
+                    <PiCircleNotchFill className='h-7 w-7 rotate-90 fill-white'/>
                   </div>
                   <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                     {navigation.map((item, index) => (
@@ -97,7 +93,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                 <div className="hidden sm:ml-6 sm:flex sm:items-center">
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <MenuButton className="flex rounded-full bg-primary-700 text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2">
+                      <MenuButton className="flex rounded-full bg-primary-700 text-sm border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:ring-accent-500  hover:scale-125">
                         <span className="sr-only">Open user menu</span>
                         <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
                       </MenuButton>
@@ -158,7 +154,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
               </div>
               <div className="border-t border-primary-600 pb-3 pt-4">
                 <div className="flex items-center px-4">
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 ">
                     <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
                   </div>
                   <div className="ml-3">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { get } from 'aws-amplify/api';
-import Markdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
+
 import ResumeExporter from './ResumeExporter';
 import { Spinner } from "flowbite-react";
 
@@ -66,7 +67,7 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
             <div className="prose max-w-none">
-              <Markdown>{tailoredResume}</Markdown>
+              <ReactMarkdown className="markdown-content">{tailoredResume}</ReactMarkdown>
             </div>
             <div className="mt-8">
               <ResumeExporter textToDownload={tailoredResume} />

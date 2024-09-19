@@ -140,7 +140,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
                   <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">{section.header}</Accordion.Title>
                   <Accordion.Content>
                     <div className="">
-                      <ReactMarkdown className="text-pretty">{section.content}</ReactMarkdown>
+                      <ReactMarkdown  className="markdown-content">{section.content}</ReactMarkdown>
                     </div>
                   </Accordion.Content>
                 </Accordion.Panel>

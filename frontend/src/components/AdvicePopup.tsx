@@ -52,7 +52,7 @@ const AdvicePopup: React.FC<AdvicePopupProps> = ({ advice, header, onClose }) =>
         </div>
         <div className="px-6 py-4">
           <div className="prose max-w-none">
-            <ReactMarkdown>{advice}</ReactMarkdown>
+            <ReactMarkdown className="markdown-content">{advice}</ReactMarkdown>
           </div>
         </div>
       </div>
