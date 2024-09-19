@@ -37,11 +37,11 @@ const Home = () => {
             </div>
             <div className="flex flex-col items-center justify-center">
                 <div className="flex items-center space-x-4">
-                    <div className="text-center">
-                        <div className="font-abel text-primary-600 text-5xl">
+                    <div className="text-center ml-32">
+                        <div className="font-abel text-primary-600 text-7xl">
                             Tell Me Your Story
                         </div>
-                        <div className={`text-primary-600 text-2xl mt-2 ${typingComplete ? 'typing-complete' : 'typing-text'}`}>
+                        <div className={`text-primary-600 text-3xl mt-2 ${typingComplete ? 'typing-complete' : 'typing-text'}`}>
                             {subText}
                         </div>
                     </div>
