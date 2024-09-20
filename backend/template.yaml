@@ -399,8 +399,8 @@ Resources:
     Properties:
       AutoVerifiedAttributes:
         - email
-      UsernameAttributes:
-        - email
+      # UsernameAttributes:
+      #   - email
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: false
       Policies:

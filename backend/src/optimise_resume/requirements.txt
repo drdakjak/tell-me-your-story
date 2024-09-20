@@ -1,4 +1,4 @@
-sshortuuid==1.0.13
+shortuuid==1.0.13
 langgraph==0.2.16
 langchain-community==0.2.16
 langchain-core==0.2.38
