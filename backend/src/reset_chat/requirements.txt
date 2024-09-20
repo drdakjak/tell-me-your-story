@@ -1,2 +1,2 @@
-langchain_community
-python-dotenv
+langchain-community==0.2.16
+python-dotenv==1.0.1

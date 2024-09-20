@@ -1,5 +1,5 @@
-langchain_community
-langchain_core
-langchain_openai
-langchain_anthropic
-python-dotenv
+langchain-community==0.2.16
+langchain-core==0.2.38
+langchain-openai==0.1.23
+langchain-anthropic==0.1.23
+python-dotenv==1.0.1

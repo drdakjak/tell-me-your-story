@@ -63,7 +63,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         path: 'invoke_chat',
         options: {
           body: {
-            conversationId: section.originalSection.section_id
+            conversationId: section.tailoredSection.section_id
           }
         }
       }).response;
@@ -95,7 +95,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         path: 'reset_chat',
         options: {
           body: {
-            conversationId: section.originalSection.section_id,
+            conversationId: section.tailoredSection.section_id,
           }
         }
       }).response;
@@ -113,7 +113,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setMessages([...messages, newMessage]);
       setInputMessage('');
       setIsWaiting(true);
-      console.log("section.originalSection.section_id", section.originalSection.section_id);
+      console.log("section.tailoredSection.section_id", section.tailoredSection.section_id);
       console.log("section.tailoredSection.content", section.tailoredSection.content);
       console.log(inputMessage);
 
@@ -123,7 +123,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           path: 'chat_resume',
           options: {
             body: {
-              conversationId: section.originalSection.section_id,
+              conversationId: section.tailoredSection.section_id,
               tailoredSection: section.tailoredSection.content,
               originalSection: section.originalSection.content,
               message: inputMessage,

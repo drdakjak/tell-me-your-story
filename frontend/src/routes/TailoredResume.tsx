@@ -18,6 +18,7 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
   const fetchTailoredResume = async () => {
     setIsLoading(true);
     setError('');
+    setTailoredResume('');
     try {
       const restOperation = get({
         apiName: 'Api',

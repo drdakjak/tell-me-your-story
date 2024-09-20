@@ -1,5 +1,6 @@
 import json
 import concurrent.futures
+import shortuuid
 
 from agent.workflow import build_workflow, invoke_graph
 from clients import get_user_table
@@ -21,7 +22,8 @@ def process_resume_section(resume_section, workflow, job_requirements, original_
     else:
         tailored_section = resume_section
         tailored_section["advice"] = ""
-
+    tailored_section['section_id'] = shortuuid.uuid()
+    
     return tailored_section
 
 
@@ -53,6 +55,7 @@ def handler(event, context):
         tailored_sections = get_tailored_resume(
             semantic_sections, job_requirements, original_resume
         )
+
         user_table.update_item(
             Key={"id": user_id},
             UpdateExpression="SET tailored_sections = :tailored_sections",

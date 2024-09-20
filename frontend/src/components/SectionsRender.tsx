@@ -71,7 +71,7 @@ const Render: React.FC<RenderProps> = ({
               <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">{section.originalSection.header}</Accordion.Title>
               <Accordion.Content>
                 <div key={index} className={`bg-white shadow-sm rounded-lg overflow-hidden ${isDesktopView ? 'md:flex' : ''}`}>
-                  <div className={`space-y-4 p- ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
+                  <div className={`space-y-4 p-6 ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
                     <div className="space-y-4">
                       <h3 className="text-xl font-bold text-secondary-900">
                         <ReactMarkdown className="markdown-header">{section.originalSection.header}</ReactMarkdown>

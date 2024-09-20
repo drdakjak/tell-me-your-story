@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
+import { demoResume, demoJobPost, demoAnalyzedJobPost, demoAnalyzedResume, demoOriginalSections, demoTailoredSections, demoTailoredResume } from '../assets/demo';
 
 interface Section {
   header: string;
@@ -24,8 +25,8 @@ interface AppState {
   
   resume: string;
   setResume: (resume: string) => void;
-  analyzedResume: string;
-  setAnalyzedResume: (resume: string) => void;
+  analyzedResume: any[];
+  setAnalyzedResume: (resume: any[]) => void;
 
   originalSections: any[];
   setOriginalSections: (originalSections: Section[]) => void;
@@ -43,13 +44,13 @@ const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentPage, setCurrentPage] = useState<string>('Job Post');
-  const [jobPost, setJobPost] = useState<string>('');
-  const [analyzedJobPost, setAnalyzedJobPost] = useState<string>('');
-  const [resume, setResume] = useState<string>('');
-  const [analyzedResume, setAnalyzedResume] = useState<string>('');
-  const [originalSections, setOriginalSections] = useState<Section[]>([]);
-  const [tailoredSections, setTailoredSections] = useState<TailoredSection[]>([]);
-  const [tailoredResume, setTailoredResume] = useState<string>('');
+  const [jobPost, setJobPost] = useState<string>(demoJobPost);
+  const [analyzedJobPost, setAnalyzedJobPost] = useState<string>(demoAnalyzedJobPost);
+  const [resume, setResume] = useState<string>(demoResume);
+  const [analyzedResume, setAnalyzedResume] = useState<any[]>(demoAnalyzedResume);
+  const [originalSections, setOriginalSections] = useState<Section[]>(demoOriginalSections);
+  const [tailoredSections, setTailoredSections] = useState<TailoredSection[]>(demoTailoredSections);
+  const [tailoredResume, setTailoredResume] = useState<string>(demoTailoredResume);
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
 

@@ -1856,6 +1856,10 @@ body{
   flex-grow: 1;
 }
 
+.grow{
+  flex-grow: 1;
+}
+
 .origin-\[0\]{
   transform-origin: 0;
 }

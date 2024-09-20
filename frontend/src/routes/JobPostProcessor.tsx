@@ -50,6 +50,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
     setIsLoading(true);
     setError('');
     setTailoredSections([])
+    setAnalyzedJobPost("")
     try {
       const restOperation = post({
         apiName: 'Api',
@@ -59,7 +60,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
         }
       });
 
-      const { body } = await restOperation.response;
+      const { body } = await restOperation.response;      
       const response = await body.json();
 
       setAnalyzedJobPost(response);

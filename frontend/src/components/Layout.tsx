@@ -54,7 +54,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
   const navigation = useMemo(() => [
     { name: 'Job Post', icon: PiBriefcaseLight, action: () => setCurrentPage('Job Post'), disabled: false },
     { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !analyzedJobPost },
-    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => setCurrentPage('Editor'), disabled: !analyzedResume },
+    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => setCurrentPage('Editor'), disabled: !analyzedJobPost || !analyzedResume.length },
     { name: 'Tailored Resume', icon: PiClipboardTextLight, action: () => setCurrentPage('Tailored Resume'), disabled: !analyzedJobPost || !analyzedResume || !tailoredSections.length },
   ], [analyzedJobPost, analyzedResume, tailoredSections, setCurrentPage]);
 

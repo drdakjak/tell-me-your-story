@@ -33,6 +33,7 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
     const optimiseResume = async () => {
         setIsLoading(true);
         setError('');
+        setIsUpdated(true)
 
         try {
             const { body } = await post({
@@ -44,11 +45,9 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
             }).response;
 
             const response = await body.json();
-            console.log(response)
             setOriginalSections(response.semantic_sections);
             setTailoredSections(response.tailored_sections);
-            console.log("tailoredSections")
-            console.log(tailoredSections)
+
         } catch (err) {
             console.error(err)
             setError('Error tailoring resume. Please try again.');
@@ -59,18 +58,12 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
     };
 
     useEffect(() => {
-        console.log("tailoredSections.length");
-        console.log(tailoredSections.length);
         if (!tailoredSections.length) {
             console.log("optimiseResume")
             optimiseResume();
         }
-        console.log("useEffect tailoredSections");
-        console.log(tailoredSections);
 
     }, [tailoredSections, originalSections, isLoading, error]);
-    console.log("useEffect tailoredSections");
-    console.log(tailoredSections);
 
     
 

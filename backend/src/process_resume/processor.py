@@ -2,7 +2,6 @@ from typing import List
 
 from pydantic import BaseModel, Field
 from langchain_core.messages import HumanMessage, SystemMessage
-import shortuuid
 
 from prompt import RESUME_SPLITTER
 from config import MODEL_NAME
@@ -27,9 +26,6 @@ def resume_parser(resume):
     ]
 
     sections_structured = model.with_structured_output(Sections).invoke(messages)
-    sections = sections_structured.dict()
-    sections = [
-        section | {"section_id": shortuuid.uuid()}
-        for section in sections['sections']
-    ]
+    sections = sections_structured.dict()['sections']
+    
     return sections

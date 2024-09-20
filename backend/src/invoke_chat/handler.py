@@ -13,9 +13,9 @@ load_dotenv()
 SESSION_TABLE = os.environ["SESSIONTABLE_TABLE_NAME"]
 
 AI_MESSAGE = """
-Hi! I'm here to help you tailor this section. 
+Hi! 
 
-I have access to the:
+I'm here to help you tailor this section. I have access to the:
 
 - hiring criteria, 
 - original section, 

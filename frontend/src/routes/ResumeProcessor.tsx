@@ -14,8 +14,8 @@ import { HiFire } from "react-icons/hi";
 interface ResumeProcessorProps {
   resume: string;
   setResume: (resume: string) => void;
-  analyzedResume: any;
-  setAnalyzedResume: (analyzedResume: any) => void;
+  analyzedResume: any[];
+  setAnalyzedResume: (analyzedResume: any[]) => void;
   setTailoredSections: (tailoredSections: any[]) => void;
   setCurrentPage: (page: string) => void;
 }
@@ -30,7 +30,6 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, an
 
   const fetchResume = async () => {
     setIsFileInputCall(true);
-    console.log(isFileInputCall);
     // setIsLoading(true);
     // setError('');
     // try {
@@ -52,7 +51,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, an
     setIsLoading(true);
     setError('');
     setTailoredSections([])
-
+    setAnalyzedResume([])
     try {
       const restOperation = post({
         apiName: 'Api',
@@ -63,6 +62,8 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, an
       });
 
       const { body } = await restOperation.response;
+      // console.log(await body.text())
+
       const response = await body.json();
 
       setAnalyzedResume(response);
@@ -152,7 +153,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, an
         </div>
       )}
 
-      {analyzedResume && (
+      {Boolean(analyzedResume.length) && (
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
             <Accordion collapseAll>

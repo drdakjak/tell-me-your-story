@@ -104,7 +104,7 @@ Resources:
   AmplifyBranch:
     Type: AWS::Amplify::Branch
     Properties:
-      BranchName: main
+      BranchName: demo
       AppId: !GetAtt App.AppId
       EnableAutoBuild: true
 
@@ -155,7 +155,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Environment:
         Variables:
@@ -169,6 +169,8 @@ Resources:
             Path: /fetch_job_post
             Method: POST
             RestApiId: !Ref Api
+      Architectures:
+        - arm64
 
   FetchJobPostLogGroup:
     Type: AWS::Logs::LogGroup
@@ -186,7 +188,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Events:
         ApiPOSTProcessJobPost:
@@ -204,6 +206,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
+      Architectures:
+        - arm64
 
   ProcessJobPostLogGroup:
     Type: AWS::Logs::LogGroup
@@ -221,7 +225,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Environment:
         Variables:
@@ -235,6 +239,8 @@ Resources:
             Path: /upload_resume
             Method: POST
             RestApiId: !Ref Api
+      Architectures:
+        - arm64
 
   UploadResumeLogGroup:
     Type: AWS::Logs::LogGroup
@@ -252,7 +258,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Events:
         ApiPOSTprocessresume:
@@ -269,6 +275,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
+      Architectures:
+        - arm64
 
   ProcessResumeLogGroup:
     Type: AWS::Logs::LogGroup
@@ -286,7 +294,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 180
+      Timeout: 100
       Tracing: Active
       Events:
         ApiPOSToptimiseresume:
@@ -303,6 +311,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
+      Architectures:
+        - arm64
 
   OptimiseResumeLogGroup:
     Type: AWS::Logs::LogGroup
@@ -320,7 +330,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Environment:
         Variables:
@@ -341,6 +351,8 @@ Resources:
             TableName: !Ref SessionTable
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
+      Architectures:
+        - arm64
 
   ChatResumeLogGroup:
     Type: AWS::Logs::LogGroup
@@ -416,7 +428,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Environment:
         Variables:
@@ -436,6 +448,8 @@ Resources:
             Path: /invoke_chat
             Method: POST
             RestApiId: !Ref Api
+      Architectures:
+        - arm64
 
   InvokeChatLogGroup:
     Type: AWS::Logs::LogGroup
@@ -453,7 +467,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Environment:
         Variables:
@@ -469,6 +483,8 @@ Resources:
             Path: /reset_chat
             Method: POST
             RestApiId: !Ref Api
+      Architectures:
+        - arm64
 
   ResetChatLogGroup:
     Type: AWS::Logs::LogGroup
@@ -486,7 +502,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Architectures:
         - arm64
@@ -525,7 +541,7 @@ Resources:
       Handler: handler.handler
       Runtime: python3.11
       MemorySize: 128
-      Timeout: 30
+      Timeout: 100
       Tracing: Active
       Architectures:
         - arm64

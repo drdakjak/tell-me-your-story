@@ -82,7 +82,6 @@ def get_tailored_section(state: AgentState):
         HumanMessage(content=user_prompt),
     ]
     tailored_section = MODEL.with_structured_output(TailoredSection).invoke(messages)
-    tailored_section["section_id"] = state["current_section"]["section_id"]
     return tailored_section
 
 
