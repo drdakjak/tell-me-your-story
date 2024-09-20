@@ -45,7 +45,7 @@ const Render: React.FC<RenderProps> = ({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="">
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setIsDesktopView(!isDesktopView)}

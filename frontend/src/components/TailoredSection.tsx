@@ -54,7 +54,7 @@ const TailoredSection: React.FC<SectionProps> = ({ section, setIsUpdated }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="">
       {isEditing ? (
         <div className="space-y-4">
           <textarea
