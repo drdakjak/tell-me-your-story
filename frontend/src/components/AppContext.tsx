@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { demoResume, demoJobPost, demoAnalyzedJobPost, demoAnalyzedResume, demoOriginalSections, demoTailoredSections, demoTailoredResume } from '../assets/demo';
-
+import { put } from 'aws-amplify/api';
 interface Section {
   header: string;
   content: string;
@@ -42,6 +42,8 @@ interface AppState {
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
+
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentPage, setCurrentPage] = useState<string>('Job Post');
   const [jobPost, setJobPost] = useState<string>(demoJobPost);
@@ -53,6 +55,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [tailoredResume, setTailoredResume] = useState<string>(demoTailoredResume);
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
+
+  const updateUser = async () => {
+    try {
+      const { body } = await put({
+        apiName: 'Api',
+        path: 'update_user',
+        options: {
+          body: {
+            jobPost: jobPost,
+            analyzedJobPost: analyzedJobPost,
+            originalResume: resume,
+            originalSections: originalSections,
+            tailoredSections: tailoredSections
+          }
+        }
+      }).response;
+      const response = await body.json();
+      console.log(response);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    } finally {
+      console.log('Update done');
+    }
+  };
+
+  useEffect(() => {
+    updateUser();
+  }, [jobPost, analyzedJobPost, resume, originalSections, tailoredSections]);
 
   return (
     <AppContext.Provider value={{

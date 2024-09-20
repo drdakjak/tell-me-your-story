@@ -93,6 +93,20 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateTailoredSection.Arn}/invocations
               responses: {}
+          /update_user:
+            put:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateUser.Arn}/invocations
+              responses: {}
+          /fetch_user:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchUser.Arn}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       Cors:
@@ -399,17 +413,13 @@ Resources:
     Properties:
       AutoVerifiedAttributes:
         - email
-      # UsernameAttributes:
-      #   - email
+      UsernameAttributes: []
+      AliasAttributes: []
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: false
       Policies:
         PasswordPolicy:
           MinimumLength: 6
-          # RequireLowercase: true
-          # RequireNumbers: true
-          # RequireSymbols: true
-          # RequireUppercase: true
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -566,6 +576,76 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${UpdateTailoredSection}
 
+  UpdateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: UpdateUser
+      CodeUri: src/update_user
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+      Events:
+        ApiPUTupdateuser:
+          Type: Api
+          Properties:
+            Path: /update_user
+            Method: PUT
+            RestApiId: !Ref Api
+
+  UpdateUserLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdateUser}
+
+  FetchUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: FetchUser
+      CodeUri: src/fetch_user
+      Handler: handler.handler
+      Runtime: python3.11
+      MemorySize: 128
+      Timeout: 30
+      Tracing: Active
+      Architectures:
+        - arm64
+      Events:
+        ApiGETfetchuser:
+          Type: Api
+          Properties:
+            Path: /fetch_user
+            Method: GET
+            RestApiId: !Ref Api
+      Environment:
+        Variables:
+          USERTABLE_TABLE_NAME: !Ref UserTable
+          USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+
+  FetchUserLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${FetchUser}
+
 Metadata:
   AWS::Composer::Groups:
     Group:
@@ -581,6 +661,8 @@ Metadata:
         - InvokeChat
         - TailoredResumeGenerator
         - UpdateTailoredSection
+        - UpdateUser
+        - FetchUser
 
 Outputs:
   CognitoUserPool:

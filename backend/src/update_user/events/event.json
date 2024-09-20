@@ -1,0 +1,10 @@
+{
+    "body": "{\"jobPost\": \"bla\", \"analyzedJobPost\": \"bla\", \"originalResume\": \"bla\", \"originalSections\": \"bla\", \"tailoredSections\": \"bla\"}",
+    "requestContext": {
+        "authorizer": {
+            "claims": {
+                "sub": "1234567890"
+            }
+        }
+    }
+}
