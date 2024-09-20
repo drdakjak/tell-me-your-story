@@ -4,44 +4,55 @@ import ReactMarkdown from 'react-markdown';
 import { ToggleSwitch } from "flowbite-react";
 import { GrLinkNext } from "react-icons/gr";
 import { Spinner } from "flowbite-react";
-import { PiCpuThin } from "react-icons/pi";
 import { Accordion } from "flowbite-react";
-import FileUpload from './FileUpload';
+import FileUpload from '../components/FileUpload';
 import { IoCloudUploadOutline } from "react-icons/io5"
+import { IoSparklesSharp } from "react-icons/io5";
+import { Toast } from "flowbite-react";
+import { HiFire } from "react-icons/hi";
+
 interface ResumeProcessorProps {
   resume: string;
   setResume: (resume: string) => void;
+  analyzedResume: any;
+  setAnalyzedResume: (analyzedResume: any) => void;
+  setTailoredSections: (tailoredSections: any[]) => void;
   setCurrentPage: (page: string) => void;
 }
 
-const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, setCurrentPage }) => {
+const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, analyzedResume, setAnalyzedResume, setTailoredSections, setCurrentPage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [analyzedResume, setAnalyzedResume] = useState('');
-  const [isUrlInput, setIsUrlInput] = useState(true);
+  const [isFileInput, setIsFileInput] = useState(!Boolean(analyzedResume) && false);
+  const [isFileInputCall, setIsFileInputCall] = useState(false);
+
 
   const fetchResume = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch job post');
-      }
-      const text = await response.text();
-      setResume(text);
-      setIsUrlInput(false); // Switch to textarea after fetching
-    } catch (err) {
-      setError('Error fetching job post. Please check the URL and try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    setIsFileInputCall(true);
+    console.log(isFileInputCall);
+    // setIsLoading(true);
+    // setError('');
+    // try {
+    //   const response = await fetch(url);
+    //   if (!response.ok) {
+    //     throw new Error('Failed to fetch job post');
+    //   }
+    //   const text = await response.text();
+    //   setResume(text);
+    //   setIsFileInput(false); // Switch to textarea after fetching
+    // } catch (err) {
+    //   setError('Error fetching job post. Please check the URL and try again.');
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const analyzeResume = async () => {
     setIsLoading(true);
     setError('');
+    setTailoredSections([])
+
     try {
       const restOperation = post({
         apiName: 'Api',
@@ -63,7 +74,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
   };
 
   const toggleInputType = () => {
-    setIsUrlInput(!isUrlInput);
+    setIsFileInput(!isFileInput);
     setResume(resume);
     setUrl(url);
   };
@@ -74,22 +85,31 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
         <div className="px-4 py-5 sm:p-6">
           <div className="flex justify-between items-center mb-4">
             <ToggleSwitch
-              checked={!isUrlInput}
+              checked={!isFileInput}
               onChange={toggleInputType}
-              label={isUrlInput ? 'Text Input' : 'File upload'}
+              label={isFileInput ? 'Text Input' : ''}
             />
           </div>
-          {isUrlInput ? (
+          {isFileInputCall && (
+            <div className="flex justify-end"><Toast>
+              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
+                <HiFire className="h-5 w-5" />
+              </div>
+              <div className="ml-3 text-sm font-normal">Sorry, work in progress. Please switch to "Text input"</div>
+              <Toast.Toggle />
+            </Toast>
+            </div>)}
+          {isFileInput ? (
             <div className="">
               <FileUpload />
               <div className="flex justify-end">
-              <button
-                onClick={fetchResume}
-                disabled={isLoading}
-                className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
-              >
-                {isLoading ? 'Processing...' : <IoCloudUploadOutline className="animate-pulse h-7 w-7"></IoCloudUploadOutline>}
-              </button>
+                <button
+                  onClick={fetchResume}
+                  disabled={isLoading}
+                  className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
+                >
+                  {isLoading ? <Spinner className="h-6 w-5"></Spinner> : <IoCloudUploadOutline className="animate-pulse h-6 w-5"></IoCloudUploadOutline>}
+                </button>
               </div>
             </div>
           ) : (
@@ -102,13 +122,14 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
             ></textarea>
           )}
           <div className="flex justify-end">
-            {resume && !isUrlInput && (<button
+            {resume && !isFileInput && (<button
               onClick={analyzeResume}
               disabled={isLoading || (!resume && !url)}
               title="Analyze"
               className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
             >
-              {isLoading ? <Spinner className="h-7 w-7"></Spinner> : <PiCpuThin className="animate-pulse h-7 w-7" />}
+              {isLoading ? <Spinner className="h-6 w-5"></Spinner> : <IoSparklesSharp className="animate-pulse h-6 w-5" />}
+
             </button>)}
           </div>
         </div>
@@ -140,7 +161,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
                   <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">{section.header}</Accordion.Title>
                   <Accordion.Content>
                     <div className="">
-                      <ReactMarkdown  className="markdown-content">{section.content}</ReactMarkdown>
+                      <ReactMarkdown className="markdown-content">{section.content}</ReactMarkdown>
                     </div>
                   </Accordion.Content>
                 </Accordion.Panel>
@@ -149,10 +170,10 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, se
             <div className="flex justify-center items-center">
               <button
                 onClick={() => setCurrentPage("Editor")}
-                title="Editor "
+                title="Editor"
                 className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
               >
-                <GrLinkNext className='animate-pulse h-7 w-7'></GrLinkNext>
+                <GrLinkNext className='animate-pulse h-6 w-5'></GrLinkNext>
               </button>
             </div>
           </div>

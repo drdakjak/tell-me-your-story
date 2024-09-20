@@ -23,10 +23,10 @@ const ResumeExporter: React.FC<ResumeExporterProps> = ({ textToDownload }) => {
     <div className="flex justify-center">
       <button
         onClick={handleDownload}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-primary-600 hover:bg-primary-800 text-white font-bold py-2 px-4 rounded"
         title="Dowload"
       >
-      <PiDownloadSimpleLight className="animate-pulse w-7 h-7" />
+      <PiDownloadSimpleLight className="animate-pulse w-6 h-5" />
       </button>
     </div>
   );

@@ -1,18 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
-import JobPostProcessor from './JobPostProcessor';
-import ResumeProcessor from './ResumeProcessor';
-import TailoredResume from './TailoredResume';
-import Editor from './Editor';
+import JobPostProcessor from '../routes/JobPostProcessor';
+import ResumeProcessor from '../routes/ResumeProcessor';
+import TailoredResume from '../routes/TailoredResume';
+import Editor from '../routes/Editor';
 import { useAppContext } from './AppContext';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { PiBriefcaseLight, PiUserCircleThin, PiClipboardTextLight} from "react-icons/pi";
-import { HiAdjustmentsVertical} from "react-icons/hi2";
+import { PiBriefcaseLight, PiUserCircleThin, PiClipboardTextLight } from "react-icons/pi";
+import { HiAdjustmentsVertical } from "react-icons/hi2";
 import { GrFormNext } from "react-icons/gr";
 import avatar from 'animal-avatar-generator'
-import { PiCircleNotch } from "react-icons/pi";
 import { PiCircleNotchFill } from "react-icons/pi";
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const user = {
@@ -26,25 +27,39 @@ function classNames(...classes: string[]) {
 }
 
 const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
-  const { 
+  const {
     currentPage, setCurrentPage,
     jobPost, setJobPost,
+    analyzedJobPost, setAnalyzedJobPost,
     resume, setResume,
-    tailoredResume, setTailoredResume,
+    analyzedResume, setAnalyzedResume,
     originalSections, setOriginalSections,
-    tailoredSections, setTailoredSections
+    tailoredSections, setTailoredSections,
+    tailoredResume, setTailoredResume,
+    isUpdated, setIsUpdated
   } = useAppContext();
-  
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Set the initial currentPage based on the URL
+    const path = location.pathname.slice(1); // Remove the leading '/'
+    if (path === 'job-post') setCurrentPage('Job Post');
+    else if (path === 'resume') setCurrentPage('Resume');
+    else if (path === 'editor') setCurrentPage('Editor');
+    else if (path === 'tailored-resume') setCurrentPage('Tailored Resume');
+  }, [location, setCurrentPage]);
+
   const navigation = useMemo(() => [
     { name: 'Job Post', icon: PiBriefcaseLight, action: () => setCurrentPage('Job Post'), disabled: false },
-    { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !jobPost },
-    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => setCurrentPage('Editor'), disabled: !resume },
-    { name: 'Tailored Resume', icon: PiClipboardTextLight, action: () => setCurrentPage('Tailored Resume'), disabled: !jobPost || !resume || !tailoredSections },
-  ], [jobPost, resume, tailoredSections, setCurrentPage]);
+    { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !analyzedJobPost },
+    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => setCurrentPage('Editor'), disabled: !analyzedResume },
+    { name: 'Tailored Resume', icon: PiClipboardTextLight, action: () => setCurrentPage('Tailored Resume'), disabled: !analyzedJobPost || !analyzedResume || !tailoredSections.length },
+  ], [analyzedJobPost, analyzedResume, tailoredSections, setCurrentPage]);
 
   const currentPageIndex = navigation.findIndex(item => item.name === currentPage);
   const generateRandomAvatar = () => {
-
     const { user } = useAuthenticator((context) => [context.user]);
     const avatar_svg = avatar(user.username, { size: 200 })
     return avatar_svg;
@@ -53,14 +68,22 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
 
   return (
     <div className="min-h-screen bg-secondary-50">
-      <Disclosure as="nav" className="bg-primary-700 shadow-lg">
+      <Disclosure as="nav" className="bg-primary-800 shadow-lg">
         {({ open }) => (
           <>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
               <div className="flex h-16 justify-between">
                 <div className="flex">
                   <div className="flex flex-shrink-0 items-center">
-                    <PiCircleNotchFill className='h-7 w-7 rotate-90 fill-white'/>
+                    <button
+                      onClick={() => {
+                        setCurrentPage('Home');
+                        navigate('/');
+                      }}
+                      className="hover:scale-125"
+                    >
+                      <PiCircleNotchFill className='h-7 w-7 rotate-90 fill-secondary-200' />
+                    </button>
                   </div>
                   <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                     {navigation.map((item, index) => (
@@ -69,23 +92,20 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                         onClick={() => !item.disabled && item.action()}
                         className={classNames(
                           item.name === currentPage
-                            ? 'border-accent-500 text-white'
+                            ? 'border-accent-500 text-secondary-100 border-b-4  mt-1 shadow-lg'
                             : item.disabled
-                            ? 'border-transparent text-primary-300 cursor-not-allowed'
-                            : 'border-transparent text-primary-100 hover:border-primary-300 hover:text-white cursor-pointer',
-                          'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition duration-150 ease-in-out'
+                              ? 'border-transparent text-primary-600 cursor-not-allowed'
+                              : 'border-transparent text-secondary-200 hover:border-primary-300 hover:text-secondary-100 cursor-pointer',
+                          'inline-flex items-center border-b-2 px-1 pt-1 text-base font-medium transition duration-150 ease-in-out'
                         )}
                       >
                         <span className="mr-2">{index + 1}.</span>
                         {item.icon && <item.icon className="h-5 w-5 mr-1" />}
                         {item.name}
-                        {/* {index < currentPageIndex && (
-                          <CheckCircleIcon className="ml-2 h-5 w-5 text-green-400" />
-                        )} */}
                         {index < navigation.length - 1 && (
-                        <GrFormNext className="ml-8"></GrFormNext>
+                          <GrFormNext className="ml-8"></GrFormNext>
                         )}
-                        
+
                       </a>
                     ))}
                   </div>
@@ -139,8 +159,8 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                       item.name === currentPage
                         ? 'bg-primary-800 border-accent-500 text-white'
                         : item.disabled
-                        ? 'border-transparent text-primary-300 cursor-not-allowed'
-                        : 'border-transparent text-primary-100 hover:bg-primary-600 hover:border-primary-300 hover:text-white cursor-pointer',
+                          ? 'border-transparent text-primary-300 cursor-not-allowed'
+                          : 'border-transparent text-primary-100 hover:bg-primary-600 hover:border-primary-300 hover:text-white cursor-pointer',
                       'block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition duration-150 ease-in-out'
                     )}
                   >
@@ -180,7 +200,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
       <div className="py-10">
         <header>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="h-2 w-full bg-gray-200 rounded-full mb-6">
+            <div className="h-1 w-full bg-gray-200 rounded-full mb-6">
               <div
                 className="h-full bg-accent-500 rounded-full transition-all duration-300 ease-in-out"
                 style={{ width: `${((currentPageIndex + 1) / navigation.length) * 100}%` }}
@@ -193,16 +213,44 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
             <div className="px-4 py-8 sm:px-0">
               <div className="rounded-lg bg-white shadow">
                 <div className="px-4 py-5 sm:p-6">
-                  {currentPage === 'Job Post' && <JobPostProcessor jobPost={jobPost} setJobPost={setJobPost} setCurrentPage={setCurrentPage}/>}
-                  {currentPage === 'Resume' && <ResumeProcessor resume={resume} setResume={setResume} setCurrentPage={setCurrentPage}/>}
-                  {currentPage === 'Editor' && <Editor
-                    originalSections={originalSections}
-                    setOriginalSections={setOriginalSections}
-                    tailoredSections={tailoredSections}
-                    setTailoredSections={setTailoredSections}
-                    setCurrentPage={setCurrentPage}
-                  />}
-                  {currentPage === 'Tailored Resume' && <TailoredResume tailoredResume={tailoredResume} setTailoredResume={setTailoredResume} setCurrentPage={setCurrentPage}/>}
+                  {currentPage === 'Job Post' && (
+                    <JobPostProcessor
+                      jobPost={jobPost}
+                      setJobPost={setJobPost}
+                      analyzedJobPost={analyzedJobPost}
+                      setAnalyzedJobPost={setAnalyzedJobPost}
+                      setTailoredSections={setTailoredSections}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  )}
+                  {currentPage === 'Resume' && (
+                    <ResumeProcessor
+                      resume={resume}
+                      setResume={setResume}
+                      analyzedResume={analyzedResume}
+                      setAnalyzedResume={setAnalyzedResume}
+                      setTailoredSections={setTailoredSections}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  )}
+                  {currentPage === 'Editor' && (
+                    <Editor
+                      originalSections={originalSections}
+                      setOriginalSections={setOriginalSections}
+                      tailoredSections={tailoredSections}
+                      setTailoredSections={setTailoredSections}
+                      setCurrentPage={setCurrentPage}
+                      setIsUpdated={setIsUpdated}
+                    />
+                  )}
+                  {currentPage === 'Tailored Resume' && (
+                    <TailoredResume
+                      tailoredResume={tailoredResume}
+                      setTailoredResume={setTailoredResume}
+                      isUpdated={isUpdated}
+                      setIsUpdated={setIsUpdated}
+                    />
+                  )}
                 </div>
               </div>
             </div>

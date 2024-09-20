@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { post } from '@aws-amplify/api';
-import Render from './SectionsRender';
+import Render from '../components/SectionsRender';
 import { GrLinkNext } from "react-icons/gr";
 import { Spinner } from "flowbite-react";
 
@@ -22,16 +22,18 @@ interface EditorProps {
     setOriginalSections: (originalSections: Section[]) => void;
     tailoredSections: TailoredSection[];
     setTailoredSections: (tailoredSections: TailoredSection[]) => void;
+    setIsUpdated: (isUpdated: boolean) => void;
     setCurrentPage: (currentPage: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, tailoredSections, setTailoredSections, setCurrentPage }) => {
+const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, tailoredSections, setTailoredSections, setIsUpdated, setCurrentPage }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
     const optimiseResume = async () => {
         setIsLoading(true);
         setError('');
+
         try {
             const { body } = await post({
                 apiName: 'Api',
@@ -42,21 +44,35 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
             }).response;
 
             const response = await body.json();
+            console.log(response)
             setOriginalSections(response.semantic_sections);
             setTailoredSections(response.tailored_sections);
+            console.log("tailoredSections")
+            console.log(tailoredSections)
         } catch (err) {
+            console.error(err)
             setError('Error tailoring resume. Please try again.');
         } finally {
+            console.log("finall")
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        console.log('tailoredSections:', tailoredSections);
+        console.log("tailoredSections.length");
+        console.log(tailoredSections.length);
         if (!tailoredSections.length) {
+            console.log("optimiseResume")
             optimiseResume();
         }
-    }, [tailoredSections]);
+        console.log("useEffect tailoredSections");
+        console.log(tailoredSections);
+
+    }, [tailoredSections, originalSections, isLoading, error]);
+    console.log("useEffect tailoredSections");
+    console.log(tailoredSections);
+
+    
 
     return (
         <div className="space-y-6">
@@ -81,10 +97,11 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
                 </div>
             )}
 
-            {(originalSections.length > 0 || tailoredSections.length > 0) && (
+            {(originalSections.length > 0 && tailoredSections.length > 0) && (
                 <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                    <div className="px-4 py-5 sm:p-6">
+                    <div className="px-4 pt-5 sm:p-2">
                         <Render
+                            setIsUpdated={setIsUpdated}
                             originalSections={originalSections}
                             tailoredSections={tailoredSections}
                         />
@@ -93,18 +110,18 @@ const Editor: React.FC<EditorProps> = ({ originalSections, setOriginalSections, 
                         <button
                             onClick={() => setCurrentPage("Tailored Resume")}
                             title="Tailored Resume"
-                            className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
+                            className="bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
                         >
-                            <GrLinkNext className='animate-pulse h-7 w-7'></GrLinkNext>
+                            <GrLinkNext className='animate-pulse h-6 w-5'></GrLinkNext>
                         </button>
                     </div>
                 </div>
 
             )}
 
-            {!isLoading && !error && originalSections.length === 0 && tailoredSections.length === 0 && (
+            {!isLoading && !error && (originalSections.length === 0 || tailoredSections.length === 0) && (
                 <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-6 text-center">
-                    <p className="text-secondary-600">No resume sections available. Click the "Tailor Resume" button to start the process.</p>
+                    <p className="text-secondary-600">No resume sections available.</p>
                 </div>
             )}
         </div>

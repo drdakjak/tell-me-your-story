@@ -8,7 +8,7 @@ INIT_PROMPT = """You're an expert resume writer. Your task is to:
 Bellow, you have access to:
 1. Original Section: The original unmodified resume section.
 2. Original Tailored Section: The accepted tailored version by user.
-3. Job Requirements: Extracted from the job post.
+3. Hiring Criteria: Extracted from the job post.
 4. The whole resume provided by the user by calling a function.
 
 
@@ -16,10 +16,11 @@ IMPORTANT: You MUST respond ONLY in the following JSON format:
 
 {{
     "text": "Any other text except the modified tailored section.",
-    "tailored_section": "Updated resume section if changes are needed. Leave empty string if no update is required."
+    "tailored_section": "The whole updated resume section if changes are needed. Leave empty string if no update is required."
 }}
 
-The response MUST contain keys "text" and "tailored_section".
+The response MUST contain keys "text" and "tailored_section". Content of the "tailored_section" must \
+be always the whole section not only a modified part.
 
 --------------------------------------------
 
@@ -30,7 +31,7 @@ Original Section:
 Original Tailored Section:
 {tailored_section}
 
-Job Requirements:
+Hiring Criteria:
 {job_requirements}
 
 

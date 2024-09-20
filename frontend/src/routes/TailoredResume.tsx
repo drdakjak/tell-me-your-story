@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { get } from 'aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 
-import ResumeExporter from './ResumeExporter';
+import ResumeExporter from '../components/ResumeExporter';
 import { Spinner } from "flowbite-react";
 
 interface TailoredResumeProps {
   tailoredResume: string;
   setTailoredResume: (tailoredResume: string) => void;
+  isUpdated: boolean;
+  setIsUpdated: (isUpdated: boolean) => void;
 }
 
-const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTailoredResume }) => {
+const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTailoredResume, isUpdated, setIsUpdated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
   const fetchTailoredResume = async () => {
     setIsLoading(true);
     setError('');
@@ -27,6 +28,8 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
       const response = await body.json();
 
       setTailoredResume(response);
+      setIsUpdated(false);
+
     } catch (err) {
       setError('Loading the tailored resume failed. Please try again.');
     } finally {
@@ -35,10 +38,10 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
   };
 
   useEffect(() => {
-    if (!tailoredResume) {
+    if (!tailoredResume || isUpdated) {
       fetchTailoredResume();
     }
-  }, [tailoredResume]);
+  }, [tailoredResume, isUpdated]);
 
   return (
     <div className="space-y-6">

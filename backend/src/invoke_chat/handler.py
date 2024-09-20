@@ -12,6 +12,26 @@ load_dotenv()
 
 SESSION_TABLE = os.environ["SESSIONTABLE_TABLE_NAME"]
 
+AI_MESSAGE = """
+Hi! I'm here to help you tailor this section. 
+
+I have access to the:
+
+- hiring criteria, 
+- original section, 
+- current tailored section, 
+- the whole resume.
+
+How can I help you?
+"""
+
+def format_ai_message(message):
+    return json.dumps({
+        "text": message,
+        "tailored_section": ""
+    })
+
+
 
 def get_message_history(conversation_id: str):
     message_history = DynamoDBChatMessageHistory(
@@ -33,8 +53,10 @@ def handler(event, context):
         body = json.loads(event["body"])
 
         conversation_id = body["conversationId"]
-    
+
         message_history = get_message_history(conversation_id)
+        if len(message_history.messages) == 0:
+            message_history.add_ai_message(format_ai_message(AI_MESSAGE))
         filtered_messages = filter_messages(message_history.messages)
         formated_filtered_messages = format_messages(filtered_messages)
         return {

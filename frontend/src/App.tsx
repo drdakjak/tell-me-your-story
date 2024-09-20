@@ -1,10 +1,13 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Layout from './components/Layout';
+import Home from './routes/Home';
 import { Amplify } from 'aws-amplify';
 import { fetchAuthSession } from "aws-amplify/auth";
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import "@aws-amplify/ui-react/styles.css";
+import PrivateRoute from './PrivateRoute';
 
 Amplify.configure({
   Auth: {
@@ -37,9 +40,17 @@ Amplify.configure({
 
 const App: React.FC = ({ signOut }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-secondary-50">
-      <Layout signOut={signOut} />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gradient-to-b from-primary-50 to-secondary-50">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/job-post" element={<Layout signOut={signOut} />} />
+          <Route path="/resume" element={<Layout signOut={signOut} />} />
+          <Route path="/editor" element={<Layout signOut={signOut} />} />
+          <Route path="/tailored-resume" element={<Layout signOut={signOut} />} />
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

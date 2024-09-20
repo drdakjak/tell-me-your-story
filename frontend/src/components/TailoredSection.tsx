@@ -10,9 +10,10 @@ import { LiaComments } from "react-icons/lia";
 
 interface SectionProps {
   section: any;
+  setIsUpdated: (isUpdated: boolean) => void;
 }
 
-const TailoredSection: React.FC<SectionProps> = ({ section }) => {
+const TailoredSection: React.FC<SectionProps> = ({ section, setIsUpdated }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDiffPopupOpen, setIsDiffPopupOpen] = useState(false);
   const [editedHeader, setEditedHeader] = useState(section.tailoredSection.header);
@@ -43,6 +44,7 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
     section.tailoredSection.header = editedHeader;
     section.tailoredSection.content = editedContent;
     setIsEditing(false);
+    setIsUpdated(true);
   };
 
   const handleUpdateTailoredContent = (newContent: string) => {
@@ -71,7 +73,7 @@ const TailoredSection: React.FC<SectionProps> = ({ section }) => {
       ) : (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-secondary-900">
-            <ReactMarkdown className="markdown-content">{section.tailoredSection.header}</ReactMarkdown>
+            <ReactMarkdown className="markdown-header">{section.tailoredSection.header}</ReactMarkdown>
           </h3>
           <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
             <ReactMarkdown className="markdown-content">{section.tailoredSection.content}</ReactMarkdown>

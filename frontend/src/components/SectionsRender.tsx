@@ -8,11 +8,13 @@ import { Accordion } from "flowbite-react";
 interface RenderProps {
   originalSections: any[];
   tailoredSections: any[];
+  setIsUpdated: (isUpdated: boolean) => void;
 }
 
 const Render: React.FC<RenderProps> = ({
   originalSections,
   tailoredSections,
+  setIsUpdated
 }) => {
   const [sections, setSections] = useState<any[]>([]);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth >= 768);
@@ -43,7 +45,7 @@ const Render: React.FC<RenderProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setIsDesktopView(!isDesktopView)}
@@ -69,7 +71,7 @@ const Render: React.FC<RenderProps> = ({
               <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">{section.originalSection.header}</Accordion.Title>
               <Accordion.Content>
                 <div key={index} className={`bg-white shadow-sm rounded-lg overflow-hidden ${isDesktopView ? 'md:flex' : ''}`}>
-                  <div className={`space-y-4 p-6 ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
+                  <div className={`space-y-4 p- ${isDesktopView ? 'md:w-1/2 md:border-r border-secondary-200' : ''}`}>
                     <div className="space-y-4">
                       <h3 className="text-xl font-bold text-secondary-900">
                         <ReactMarkdown className="markdown-header">{section.originalSection.header}</ReactMarkdown>
@@ -81,7 +83,7 @@ const Render: React.FC<RenderProps> = ({
                     <div className="flex space-x-2 justify-center">
                       <button
                         onClick={() => openAdvicePopup(index)}
-                        className="px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"
+                        className="px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-700 transition duration-150 ease-in-out"
                         title="View Advice"
                       >
                         <MdOutlineFeedback className="h-5 w-5" />
@@ -89,7 +91,7 @@ const Render: React.FC<RenderProps> = ({
                     </div>
                   </div>
                   <div className={`p-6 ${isDesktopView ? 'md:w-1/2' : ''}`}>
-                    <TailoredSection section={section} />
+                    <TailoredSection section={section} setIsUpdated={setIsUpdated}/>
                   </div>
                 </div>
               </Accordion.Content>

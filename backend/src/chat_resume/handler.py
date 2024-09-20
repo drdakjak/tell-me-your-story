@@ -7,8 +7,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from pydantic import BaseModel, Field
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import SystemMessage
 
 from dotenv import load_dotenv
 
@@ -31,13 +30,6 @@ def get_message_history(session_id: str):
     return message_history
 
 
-class Response(BaseModel):
-    response: str = Field(
-        description="The response that will be showed in user's chat in Markdown format.",
-    )
-    tailored_section: str = Field(
-        description="The newly tailored section based on user's requirements in Markdown format. Can be empty string if any update is required."
-    )
 
 
 def handler(event, context):
@@ -125,8 +117,6 @@ def handler(event, context):
             "body": json.dumps(parsed_response),
         }
     except Exception as e:
-        print(e)
-
         return {
             "statusCode": 500,
             "body": json.dumps(e.__repr__()),

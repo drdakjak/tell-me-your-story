@@ -16,16 +16,27 @@ interface TailoredSection {
 interface AppState {
   currentPage: string;
   setCurrentPage: (page: string) => void;
+
   jobPost: string;
   setJobPost: (post: string) => void;
+  analyzedJobPost: string;
+  setAnalyzedJobPost: (post: string) => void;
+  
   resume: string;
   setResume: (resume: string) => void;
-  tailoredResume: string;
-  setTailoredResume: (resume: string) => void;
+  analyzedResume: string;
+  setAnalyzedResume: (resume: string) => void;
+
   originalSections: any[];
   setOriginalSections: (originalSections: Section[]) => void;
   tailoredSections: any[];
   setTailoredSections: (tailoredSections: TailoredSection[]) => void;
+
+  tailoredResume: string;
+  setTailoredResume: (resume: string) => void;
+
+  isUpdated: boolean;
+  setIsUpdated: (isUpdated: boolean) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -33,10 +44,14 @@ const AppContext = createContext<AppState | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentPage, setCurrentPage] = useState<string>('Job Post');
   const [jobPost, setJobPost] = useState<string>('');
+  const [analyzedJobPost, setAnalyzedJobPost] = useState<string>('');
   const [resume, setResume] = useState<string>('');
+  const [analyzedResume, setAnalyzedResume] = useState<string>('');
+  const [originalSections, setOriginalSections] = useState<Section[]>([]);
+  const [tailoredSections, setTailoredSections] = useState<TailoredSection[]>([]);
   const [tailoredResume, setTailoredResume] = useState<string>('');
-  const [originalSections, setOriginalSections] = useState([]);
-  const [tailoredSections, setTailoredSections] = useState([]);
+  const [isUpdated, setIsUpdated] = useState<boolean>(false);
+
 
   return (
     <AppContext.Provider value={{
@@ -44,14 +59,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setCurrentPage,
       jobPost,
       setJobPost,
+      analyzedJobPost,
+      setAnalyzedJobPost,
       resume,
       setResume,
+      analyzedResume,
+      setAnalyzedResume,
       tailoredResume,
       setTailoredResume,
       originalSections,
       setOriginalSections,
       tailoredSections,
-      setTailoredSections
+      setTailoredSections,
+      isUpdated,
+      setIsUpdated
     }}>
       {children}
     </AppContext.Provider>

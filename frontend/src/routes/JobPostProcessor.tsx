@@ -4,42 +4,52 @@ import ReactMarkdown from 'react-markdown';
 import { ToggleSwitch } from "flowbite-react";
 import { GrLinkNext } from "react-icons/gr";
 import { Spinner } from "flowbite-react";
-import { PiCpuThin } from "react-icons/pi";
 import { Accordion } from "flowbite-react";
+import { IoSparklesSharp } from "react-icons/io5";
+import { Toast } from "flowbite-react";
+import { HiFire } from "react-icons/hi";
+
 interface JobPostProcessorProps {
   jobPost: string;
   setJobPost: (jobPost: string) => void;
+  analyzedJobPost: string;
+  setAnalyzedJobPost: (analyzedJobPost: string) => void;
+  setTailoredSections: (tailoredSections: any[]) => void;
   setCurrentPage: (page: string) => void;
 }
 
-const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost, setCurrentPage }) => {
+const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost, analyzedJobPost, setAnalyzedJobPost, setTailoredSections, setCurrentPage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [analyzedJobPost, setAnalyzedJobPost] = useState('');
-  const [isUrlInput, setIsUrlInput] = useState(true);
+  const [isUrlInput, setIsUrlInput] = useState(!Boolean(analyzedJobPost) && false);
+  const [isFetchUrlCall, setIsFetchUrlCall] = useState(false);
 
   const fetchJobPost = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch job post');
-      }
-      const text = await response.text();
-      setJobPost(text);
-      setIsUrlInput(false); // Switch to textarea after fetching
-    } catch (err) {
-      setError('Error fetching job post. Please check the URL and try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    setIsFetchUrlCall(true);
+    console.log(isFetchUrlCall);
+
+    // setIsLoading(true);
+    // setError('');
+    // try {
+    //   const response = await fetch(url);
+    //   if (!response.ok) {
+    //     throw new Error('Failed to fetch job post');
+    //   }
+    //   const text = await response.text();
+    //   setJobPost(text);
+    //   setIsUrlInput(false); // Switch to textarea after fetching
+    // } catch (err) {
+    //   setError('Error fetching job post. Please check the URL and try again.');
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const analyzeJobPost = async () => {
     setIsLoading(true);
     setError('');
+    setTailoredSections([])
     try {
       const restOperation = post({
         apiName: 'Api',
@@ -74,9 +84,18 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
             <ToggleSwitch
               checked={!isUrlInput}
               onChange={toggleInputType}
-              label={isUrlInput ? 'Text Input' : 'URL Input'}
+              label={isUrlInput ? 'Text Input' : ''}
             />
           </div>
+          {isFetchUrlCall && (
+            <div className="flex justify-end"><Toast>
+              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
+                <HiFire className="h-5 w-5" />
+              </div>
+              <div className="ml-3 text-sm font-normal">Sorry, work in progress. Please switch to "Text input"</div>
+              <Toast.Toggle />
+            </Toast>
+            </div>)}
           {isUrlInput ? (
             <div className="flex">
               <input
@@ -110,11 +129,10 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
               title="Analyze"
               className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
             >
-              {isLoading ? <Spinner className="h-7 w-7"></Spinner> : <PiCpuThin className="animate-pulse h-7 w-7" />}
+              {isLoading ? <Spinner className="h-6 w-5"></Spinner> : <IoSparklesSharp className="animate-pulse h-6 w-5" />}
             </button>)}
           </div>
         </div>
-
       </div>
 
 
@@ -138,7 +156,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
           <div className="px-4 py-5 sm:p-6">
             <Accordion collapseAll>
               <Accordion.Panel>
-                <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">Analyzed Job Post</Accordion.Title>
+                <Accordion.Title className="text-lg leading-6 font-normal text-secondary-900 p-4">Hiring criteria</Accordion.Title>
                 <Accordion.Content>
                   <div className="">
                     <ReactMarkdown className="markdown-content">{analyzedJobPost}</ReactMarkdown>
@@ -152,7 +170,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
                 title="Resume"
                 className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
               >
-                <GrLinkNext className='animate-pulse h-7 w-7'></GrLinkNext>
+                <GrLinkNext className='animate-pulse h-6 w-5'></GrLinkNext>
               </button>
             </div>
           </div>
