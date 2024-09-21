@@ -2,7 +2,6 @@ import json
 
 def handler(event, context):
     # Auto confirm the user
-    print(event) # TODO: Remove this line
     event['response']['autoConfirmUser'] = True
 
     # Set the email as verified if it's in the request
