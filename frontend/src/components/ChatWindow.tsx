@@ -136,6 +136,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           }
         }).response;
         let response = await body.json();
+        
         const botResponse: Message = {
           type: 'ai',
           content: formatAIResponse(response)
