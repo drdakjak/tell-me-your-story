@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { PiCircleNotchThin } from "react-icons/pi";
+import { useState, useEffect } from "react";
 import { GrLinkNext } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from '../components/AppContext';

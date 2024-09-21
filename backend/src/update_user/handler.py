@@ -32,6 +32,9 @@ def handler(event, context):
         tailored_sections = body["tailoredSections"]
         update_user_data(user_id, "tailored_sections", tailored_sections)
 
+        tailored_resume = body["tailoredResume"]
+        update_user_data(user_id, "tailored_resume", tailored_resume)
+
         return {
                 "statusCode": 200,
                 "body": json.dumps("User data updated successfully"),

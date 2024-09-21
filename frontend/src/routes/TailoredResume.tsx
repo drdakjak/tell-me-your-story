@@ -28,7 +28,11 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ tailoredResume, setTail
       const { body } = await restOperation.response;
       const response = await body.json();
 
-      setTailoredResume(response);
+      if (response && typeof response === 'string') {
+        setTailoredResume(response);
+      } else {
+        setError('Invalid response received. Please try again.');
+      }
       setIsUpdated(false);
 
     } catch (err) {

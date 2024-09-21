@@ -24,7 +24,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, an
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [isFileInput, setIsFileInput] = useState(!Boolean(analyzedResume) && false);
+  const [isFileInput, setIsFileInput] = useState<boolean>(!Boolean(analyzedResume) && false);
   const [isFileInputCall, setIsFileInputCall] = useState(false);
 
 
@@ -66,7 +66,11 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({ resume, setResume, an
 
       const response = await body.json();
 
-      setAnalyzedResume(response);
+      if (Array.isArray(response)) {
+        setAnalyzedResume(response);
+      } else {
+        setError('Unexpected response format.');
+      }
     } catch (err) {
       setError('Error analyzing resume. Please try again.');
     } finally {

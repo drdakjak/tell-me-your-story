@@ -14,6 +14,11 @@ interface Message {
   content: string;
 }
 
+interface AIResponse {
+  text: string;
+  tailored_section: string;
+}
+
 const WritingAnimation: React.FC = () => (
   <div className="flex items-center space-x-1">
     <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
@@ -47,7 +52,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const formatAIResponse = (content) => {
+  const formatAIResponse = (content: AIResponse) => {
     let message = content.text;
     if (content.tailored_section) {
       message += "\n\n";
@@ -58,7 +63,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const invokeChat = async () => {
     setIsWaiting(true);
     try {
-      const { body } = await post({
+      const restOperation =  post({
         apiName: 'Api',
         path: 'invoke_chat',
         options: {
@@ -66,20 +71,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             conversationId: section.tailoredSection.section_id
           }
         }
-      }).response;
-      console.log(body);
-      const response = await body.json();
-      console.log(response);
-      response.map((message: any) => {
-        if (message.type === 'ai' && message.content) {
-          const content = JSON.parse(message.content)
-          message.content = formatAIResponse(content);
-        } else {
-          message.content = message.content;
-        }
       });
 
-      setMessages(response);
+      const { body } = await restOperation.response;
+      const response = await body.json();
+      if (Array.isArray(response)) {
+        const formattedResponse = response.map((message: Message) => {
+          if (message.type === 'ai' && message.content) {
+            const content = JSON.parse(message.content);
+            message.content = formatAIResponse(content);
+          }
+          return message;
+        });
+        setMessages(formattedResponse); // Pass the correctly typed array to setMessages
+      }
     } catch (error) {
       console.error('Error invoking chat:', error);
     } finally {
@@ -130,9 +135,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             }
           }
         }).response;
-        console.log(body);
         let response = await body.json();
-        console.log(response);
         const botResponse: Message = {
           type: 'ai',
           content: formatAIResponse(response)

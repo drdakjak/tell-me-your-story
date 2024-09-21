@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import JobPostProcessor from '../routes/JobPostProcessor';
@@ -14,7 +14,9 @@ import avatar from 'animal-avatar-generator'
 import { PiCircleNotchFill } from "react-icons/pi";
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
+import { get } from 'aws-amplify/api';
+import initDemoUser from './InitUserData';
+import { Spinner } from "flowbite-react";
 
 const user = {
   name: '',
@@ -39,8 +41,52 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     isUpdated, setIsUpdated
   } = useAppContext();
 
+  const [userData, setUserData] = useState<any>(null);
+  const [isUserDataFetched, setIsUserDataFetched] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const location = useLocation();
   const navigate = useNavigate();
+
+
+  const fetchUser = async () => {
+    console.log('Fetching user');
+    try {
+      const { body } = await get({
+        apiName: 'Api',
+        path: 'fetch_user',
+      }).response;
+      const response = await body.json();
+      setUserData(response);
+      setIsUserDataFetched(true); // Indicate that user data has been fetched
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
+      console.log('User fetched');
+    }
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+      await initDemoUser();
+      await fetchUser();
+    };
+
+    initialize();
+  }, []); 
+
+
+  useEffect(() => {
+    if (isUserDataFetched && userData) {
+      setJobPost(userData.job_post || '');
+      setAnalyzedJobPost(userData.job_requirements || '');
+      setResume(userData.original_resume || '');
+      setAnalyzedResume(userData.semantic_sections || []);
+      setOriginalSections(userData.semantic_sections || []);
+      setTailoredSections(userData.tailored_sections || []);
+      setTailoredResume(userData.tailored_resume || '');
+    }
+  }, [isUserDataFetched, userData]); 
 
   useEffect(() => {
     // Set the initial currentPage based on the URL
@@ -50,7 +96,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     else if (path === 'editor') setCurrentPage('Editor');
     else if (path === 'tailored-resume') setCurrentPage('Tailored Resume');
   }, [location, setCurrentPage]);
-
+  
   const navigation = useMemo(() => [
     { name: 'Job Post', icon: PiBriefcaseLight, action: () => setCurrentPage('Job Post'), disabled: false },
     { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !analyzedJobPost },
@@ -59,14 +105,19 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
   ], [analyzedJobPost, analyzedResume, tailoredSections, setCurrentPage]);
 
   const currentPageIndex = navigation.findIndex(item => item.name === currentPage);
+
   const generateRandomAvatar = () => {
+    
     const { user } = useAuthenticator((context) => [context.user]);
     const avatar_svg = avatar(user.username, { size: 200 })
     return avatar_svg;
   }
   user.imageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(generateRandomAvatar())}`
 
+  
+
   return (
+
     <div className="min-h-screen bg-secondary-50">
       <Disclosure as="nav" className="bg-primary-800 shadow-lg">
         {({ open }) => (
@@ -209,10 +260,16 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
           </div>
         </header>
         <main>
+          
           <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="px-4 py-8 sm:px-0">
               <div className="rounded-lg bg-white shadow">
                 <div className="px-4 py-5 sm:p-6">
+                {isLoading && (
+        <div className="flex justify-center items-center py-12">
+          <Spinner className="h-7 w-7"></Spinner>
+        </div>
+      )}
                   {currentPage === 'Job Post' && (
                     <JobPostProcessor
                       jobPost={jobPost}

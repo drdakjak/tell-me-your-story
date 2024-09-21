@@ -22,7 +22,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
-  const [isUrlInput, setIsUrlInput] = useState(!Boolean(analyzedJobPost) && false);
+  const [isUrlInput, setIsUrlInput] = useState<boolean>(!Boolean(analyzedJobPost) && false);
   const [isFetchUrlCall, setIsFetchUrlCall] = useState(false);
 
   const fetchJobPost = async () => {
@@ -63,7 +63,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
       const { body } = await restOperation.response;      
       const response = await body.json();
 
-      setAnalyzedJobPost(response);
+      setAnalyzedJobPost(JSON.stringify(response));
     } catch (err) {
       setError('Error analyzing job post. Please try again.');
     } finally {

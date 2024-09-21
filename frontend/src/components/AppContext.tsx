@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { demoResume, demoJobPost, demoAnalyzedJobPost, demoAnalyzedResume, demoOriginalSections, demoTailoredSections, demoTailoredResume } from '../assets/demo';
-import { put } from 'aws-amplify/api';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
+// import { demoResume, demoJobPost, demoAnalyzedJobPost, demoAnalyzedResume, demoOriginalSections, demoTailoredSections, demoTailoredResume } from '../assets/demo';
+
 interface Section {
   header: string;
   content: string;
@@ -22,14 +22,16 @@ interface AppState {
   setJobPost: (post: string) => void;
   analyzedJobPost: string;
   setAnalyzedJobPost: (post: string) => void;
-  
+
   resume: string;
   setResume: (resume: string) => void;
+  
   analyzedResume: any[];
   setAnalyzedResume: (resume: any[]) => void;
 
   originalSections: any[];
   setOriginalSections: (originalSections: Section[]) => void;
+  
   tailoredSections: any[];
   setTailoredSections: (tailoredSections: TailoredSection[]) => void;
 
@@ -42,47 +44,18 @@ interface AppState {
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
-
-
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentPage, setCurrentPage] = useState<string>('Job Post');
-  const [jobPost, setJobPost] = useState<string>(demoJobPost);
-  const [analyzedJobPost, setAnalyzedJobPost] = useState<string>(demoAnalyzedJobPost);
-  const [resume, setResume] = useState<string>(demoResume);
-  const [analyzedResume, setAnalyzedResume] = useState<any[]>(demoAnalyzedResume);
-  const [originalSections, setOriginalSections] = useState<Section[]>(demoOriginalSections);
-  const [tailoredSections, setTailoredSections] = useState<TailoredSection[]>(demoTailoredSections);
-  const [tailoredResume, setTailoredResume] = useState<string>(demoTailoredResume);
+  const [jobPost, setJobPost] = useState<string>('');
+  const [analyzedJobPost, setAnalyzedJobPost] = useState<string>('');
+  const [resume, setResume] = useState<string>('');
+  const [analyzedResume, setAnalyzedResume] = useState<any[]>([]);
+  const [originalSections, setOriginalSections] = useState<Section[]>([]);
+  const [tailoredSections, setTailoredSections] = useState<TailoredSection[]>([]);
+  const [tailoredResume, setTailoredResume] = useState<string>('');
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
-
-  const updateUser = async () => {
-    try {
-      const { body } = await put({
-        apiName: 'Api',
-        path: 'update_user',
-        options: {
-          body: {
-            jobPost: jobPost,
-            analyzedJobPost: analyzedJobPost,
-            originalResume: resume,
-            originalSections: originalSections,
-            tailoredSections: tailoredSections
-          }
-        }
-      }).response;
-      const response = await body.json();
-      console.log(response);
-    } catch (error) {
-      console.error('Error updating user:', error);
-    } finally {
-      console.log('Update done');
-    }
-  };
-
-  useEffect(() => {
-    updateUser();
-  }, [jobPost, analyzedJobPost, resume, originalSections, tailoredSections]);
+  
 
   return (
     <AppContext.Provider value={{

@@ -29,7 +29,12 @@ def handler(event, context):
         messages = [system_message, user_prompt]
         chain = model | StrOutputParser()
         response = chain.invoke(messages)
-
+        
+        user_table.update_item(
+            Key={"id": user_id},
+            UpdateExpression="SET tailored_resume = :response",
+            ExpressionAttributeValues={":response": response},
+        )
         return {
             "statusCode": 200,
             "headers": {
