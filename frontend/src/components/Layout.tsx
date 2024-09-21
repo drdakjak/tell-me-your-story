@@ -73,7 +73,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     };
 
     initialize();
-  }, []); 
+  }, []);
 
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
       setTailoredSections(userData.tailored_sections || []);
       setTailoredResume(userData.tailored_resume || '');
     }
-  }, [isUserDataFetched, userData]); 
+  }, [isUserDataFetched, userData]);
 
   useEffect(() => {
     // Set the initial currentPage based on the URL
@@ -96,7 +96,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
     else if (path === 'editor') setCurrentPage('Editor');
     else if (path === 'tailored-resume') setCurrentPage('Tailored Resume');
   }, [location, setCurrentPage]);
-  
+
   const navigation = useMemo(() => [
     { name: 'Job Post', icon: PiBriefcaseLight, action: () => setCurrentPage('Job Post'), disabled: false },
     { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !analyzedJobPost },
@@ -107,14 +107,14 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
   const currentPageIndex = navigation.findIndex(item => item.name === currentPage);
 
   const generateRandomAvatar = () => {
-    
+
     const { user } = useAuthenticator((context) => [context.user]);
     const avatar_svg = avatar(user.username, { size: 200 })
     return avatar_svg;
   }
   user.imageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(generateRandomAvatar())}`
 
-  
+
 
   return (
 
@@ -260,16 +260,19 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
           </div>
         </header>
         <main>
-          
+
           <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="px-4 py-8 sm:px-0">
               <div className="rounded-lg bg-white shadow">
                 <div className="px-4 py-5 sm:p-6">
-                {isLoading && (
-        <div className="flex justify-center items-center py-12">
-          <Spinner className="h-7 w-7"></Spinner>
-        </div>
-      )}
+                  {isLoading && (
+                    <div>
+                    <div className="flex justify-center items-center text-primary-700 text-base">Loading demo data</div>
+                    <div className="flex justify-center items-center">
+                      <Spinner className="h-7 w-7"></Spinner>
+                    </div>
+                    </div>
+                  )}
                   {currentPage === 'Job Post' && (
                     <JobPostProcessor
                       jobPost={jobPost}
