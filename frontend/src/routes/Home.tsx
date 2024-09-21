@@ -54,7 +54,7 @@ const Home = () => {
             <div className="flex flex-col items-center justify-center">
                 <div className="flex items-center space-x-4">
                     <div className="text-center ml-32">
-                        <div className="font-abel text-primary-600 text-3xl md:text-7xl 2xl:text-9xl">
+                        <div className="font-abel text-primary-800 text-3xl md:text-7xl 2xl:text-9xl">
                             Tell Me Your Story
                         </div>
                         <div className={`font-abel text-primary-600 md:text-4xl 2xl:text-6xl mt-2 ${typingComplete ? 'typing-complete' : 'typing-text'}`}>
@@ -64,7 +64,7 @@ const Home = () => {
                     <div className="w-8 h-8 md:w-12 md:h-12  2xl:w-16 2xl:h-16 flex items-center justify-center">
                         {showButton && (
                             <button
-                                className="animate-fade-in bg-primary-600 hover:bg-primary-700 text-white rounded-full flex-none h-full w-full transition-all duration-300 ease-in-out transform hover:scale-110"
+                                className="animate-fade-in bg-primary-600 hover:bg-primary-800 text-white rounded-full flex-none h-full w-full transition-all duration-300 ease-in-out transform hover:scale-110"
                                 title="Start"
                                 onClick={handleStartClick}
                             >
