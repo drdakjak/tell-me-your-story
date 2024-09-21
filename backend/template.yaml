@@ -411,8 +411,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      AutoVerifiedAttributes:
-        - email
+      AutoVerifiedAttributes: []
       UsernameAttributes: []
       AliasAttributes: []
       AdminCreateUserConfig:
@@ -420,6 +419,8 @@ Resources:
       Policies:
         PasswordPolicy:
           MinimumLength: 6
+      LambdaConfig:
+        PreSignUp: !GetAtt PreSignUpFunction.Arn
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -427,6 +428,24 @@ Resources:
       UserPoolId: !Ref CognitoUserPool
       ClientName: !Ref CognitoUserPool
       GenerateSecret: false
+
+  PreSignUpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/pre_signup
+      Handler: handler.handler
+      Runtime: python3.11
+      Description: Pre-signup Lambda trigger for Cognito User Pool
+      Architectures:
+        - arm64
+
+  PreSignUpFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref PreSignUpFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt CognitoUserPool.Arn
 
   InvokeChat:
     Type: AWS::Serverless::Function
@@ -521,10 +540,7 @@ Resources:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
           OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
-
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref UserTable
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
       Events:

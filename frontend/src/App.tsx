@@ -7,7 +7,6 @@ import { Amplify } from 'aws-amplify';
 import { fetchAuthSession } from "aws-amplify/auth";
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import "@aws-amplify/ui-react/styles.css";
-import PrivateRoute from './PrivateRoute';
 
 Amplify.configure({
   Auth: {
