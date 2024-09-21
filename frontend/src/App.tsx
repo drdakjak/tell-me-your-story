@@ -8,6 +8,9 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import "@aws-amplify/ui-react/styles.css";
 
+import Sandbox from './routes/Sandbox';
+
+
 Amplify.configure({
   Auth: {
     Cognito: {
@@ -52,6 +55,10 @@ const App: React.FC<AppProps> = ({ signOut }) => {
           <Route path="/resume" element={<Layout signOut={signOut} />} />
           <Route path="/editor" element={<Layout signOut={signOut} />} />
           <Route path="/tailored-resume" element={<Layout signOut={signOut} />} />
+
+          
+          <Route path="/sandbox" element={<Sandbox />} />
+
         </Routes>
       </div>
     </Router>
