@@ -123,12 +123,12 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
               placeholder="Paste job post here"
             ></textarea>
           )}
-          <div className="flex justify-end">
+          <div className="grid justify-items-stretch md:justify-items-end">
             {jobPost && !isUrlInput && (<button
               onClick={analyzeJobPost}
               disabled={isLoading || (!jobPost && !url)}
               title="Analyze"
-              className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform hover:scale-105"
+              className="bg-primary-600 text-white px-5 py-2 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 transition duration-150 ease-in-out transform md:hover:scale-105"
             >
               {isLoading ? <Spinner className="h-6 w-5"></Spinner> : <IoSparklesSharp className="animate-pulse h-6 w-5" />}
             </button>)}
@@ -165,11 +165,11 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({ jobPost, setJobPost
                 </Accordion.Content>
               </Accordion.Panel>
             </Accordion>
-            <div className="flex justify-center items-center">
+            <div className="grid justify-items-stretch md:justify-items-center">
               <button
                 onClick={() => setCurrentPage("Resume")}
                 title="Resume"
-                className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform hover:scale-105"
+                className="mt-2 bg-accent-500 text-white px-5 py-2 rounded-md hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out transform md:hover:scale-105"
               >
                 <GrLinkNext className='animate-pulse h-6 w-5'></GrLinkNext>
               </button>
