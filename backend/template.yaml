@@ -146,10 +146,6 @@ Resources:
                 paths:
                   - node_modules/**/*
             appRoot: frontend
-      # CustomRules:
-      #   - Source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>'
-      #     Target: "/index.html"
-      #     Status: "200"
       AccessToken: "{{resolve:secretsmanager:tell-me-your-story-github-token}}"
       EnvironmentVariables:
         - Name: AMPLIFY_MONOREPO_APP_ROOT
@@ -381,7 +377,7 @@ Resources:
   UserTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: UserTable
+      TableName: TellMeYourStoryUserTable
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -397,13 +393,17 @@ Resources:
   SessionTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: SessionTable
+      TableName: TellMeYourStorySessionTable
       AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
         - AttributeName: SessionId
           AttributeType: S
       KeySchema:
-        - AttributeName: SessionId
+        - AttributeName: UserId
           KeyType: HASH
+        - AttributeName: SessionId
+          KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       ProvisionedThroughput:

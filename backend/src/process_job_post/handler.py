@@ -9,9 +9,10 @@ user_table = get_user_table()
 def handler(event, context):
     try:
         body = json.loads(event["body"])
-        job_post = body["jobPost"]
-        user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
+        job_post = body["jobPost"]
+
+        user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
         user_table.update_item(
             Key={"id": user_id},

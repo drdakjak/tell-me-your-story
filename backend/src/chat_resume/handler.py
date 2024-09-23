@@ -8,6 +8,7 @@ from langchain_community.chat_message_histories import DynamoDBChatMessageHistor
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage
+from langchain_core.runnables import ConfigurableFieldSpec
 
 from dotenv import load_dotenv
 
@@ -23,13 +24,15 @@ SESSION_TABLE = os.environ["SESSIONTABLE_TABLE_NAME"]
 user_table = get_user_table()
 
 
-def get_message_history(session_id: str):
+def get_message_history(user_id: str, session_id: str):
+    key = {
+        "UserId": user_id,
+        "SessionId": session_id,
+    }
     message_history = DynamoDBChatMessageHistory(
-        table_name=SESSION_TABLE, session_id=str(session_id)
+        table_name=SESSION_TABLE, session_id=str(user_id), key=key
     )
     return message_history
-
-
 
 
 def handler(event, context):
@@ -81,9 +84,27 @@ def handler(event, context):
             get_message_history,
             input_messages_key="user_message",
             history_messages_key="history",
+            history_factory_config=[
+                ConfigurableFieldSpec(
+                    id="user_id",
+                    annotation=str,
+                    name="User ID",
+                    description="Unique identifier for the user.",
+                    default="",
+                    is_shared=True,
+                ),
+                ConfigurableFieldSpec(
+                    id="session_id",
+                    annotation=str,
+                    name="Conversation ID",
+                    description="Unique identifier for the conversation.",
+                    default="",
+                    is_shared=True,
+                ),
+            ],
         )
 
-        config = {"configurable": {"session_id": conversation_id}}
+        config = {"configurable": {"session_id": conversation_id, "user_id": user_id}}
         response = chain_with_chat_history.invoke(
             {
                 "user_message": user_message,
@@ -95,7 +116,7 @@ def handler(event, context):
             for tool_call in response.tool_calls:
                 selected_tool = eval(tool_call["name"].lower())
                 tool_msg = selected_tool.invoke(tool_call)
-                history = get_message_history(conversation_id)
+                history = get_message_history(user_id=user_id, session_id=conversation_id)
                 history.add_message(tool_msg)
             system_prompt = INIT_PROMPT.format(
                 original_section=original_section,
