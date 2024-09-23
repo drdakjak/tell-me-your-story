@@ -1,12 +1,11 @@
 import React from 'react';
-import { PiDownloadSimpleLight } from "react-icons/pi";
+import { IoDownloadOutline } from 'react-icons/io5';
 
 interface ResumeExporterProps {
   textToDownload: string;
 }
 
 const ResumeExporter: React.FC<ResumeExporterProps> = ({ textToDownload }) => {
-
   const handleDownload = () => {
     const blob = new Blob([textToDownload], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -20,13 +19,14 @@ const ResumeExporter: React.FC<ResumeExporterProps> = ({ textToDownload }) => {
   };
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-6">
       <button
         onClick={handleDownload}
-        className="bg-primary-600 hover:bg-primary-800 text-white font-bold py-2 px-4 rounded"
-        title="Dowload"
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 ease-in-out flex items-center space-x-2"
+        title="Download Resume"
       >
-      <PiDownloadSimpleLight className="animate-pulse w-6 h-5" />
+        <IoDownloadOutline className="w-5 h-5" />
+        <span>Download Resume</span>
       </button>
     </div>
   );
