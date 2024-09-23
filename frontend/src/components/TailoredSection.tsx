@@ -3,10 +3,7 @@ import { put } from '@aws-amplify/api';
 import ReactMarkdown from 'react-markdown';
 import ChatWindow from './ChatWindow';
 import DiffPopup from './DiffPopup';
-import { CiEdit } from "react-icons/ci";
-import { VscDiffMultiple } from "react-icons/vsc";
-import { TfiCheckBox } from "react-icons/tfi";
-import { LiaComments } from "react-icons/lia";
+import { IoCreateOutline, IoCheckmarkDoneOutline, IoGitCompareOutline, IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 
 interface SectionProps {
   section: any;
@@ -57,61 +54,64 @@ const TailoredSection: React.FC<SectionProps> = ({ section, setIsUpdated }) => {
     <div className="">
       {isEditing ? (
         <div className="space-y-4">
-          <textarea
+          <input
             value={editedHeader}
             onChange={(e) => setEditedHeader(e.target.value)}
-            className="w-full p-2 border border-secondary-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out"
-            rows={1}
+            className="w-full p-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"
           />
           <textarea
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
-            className="w-full p-2 border border-secondary-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition duration-150 ease-in-out resize-vertical"
+            className="w-full p-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out resize-vertical"
             rows={10}
           />
         </div>
       ) : (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-secondary-900">
-            <ReactMarkdown className="markdown-header">{section.tailoredSection.header}</ReactMarkdown>
+          <h3 className="text-lg font-semibold text-gray-800">
+            <ReactMarkdown  className="markdown-header">{section.tailoredSection.header}</ReactMarkdown>
           </h3>
-          <div className="prose max-w-none text-secondary-700 bg-white p-4 rounded-md border border-secondary-200">
+          <div className="prose max-w-none text-gray-600 bg-gray-50 p-4 rounded-md border border-gray-200">
             <ReactMarkdown className="markdown-content">{section.tailoredSection.content}</ReactMarkdown>
           </div>
         </div>
       )}
 
-      <div className="flex space-x-2 justify-center">
+      <div className="flex space-x-2 justify-center mt-4">
         {isEditing ? (
           <button
             onClick={handleSave}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
             title="Save Changes"
           >
-            <TfiCheckBox className="w-5 h-5" />
+            <IoCheckmarkDoneOutline className="w-5 h-5 mr-1" />
+            Save
           </button>
         ) : (
           <button
             onClick={handleIsEditing}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition duration-150 ease-in-out"            
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             title="Edit"
           >
-            <CiEdit className="w-5 h-5" />
+            <IoCreateOutline className="w-5 h-5 mr-1" />
+            Edit
           </button>
         )}
         <button
           onClick={toggleDiffPopup}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 transition duration-150 ease-in-out"
+          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
           title="View Diff"
         >
-          <VscDiffMultiple className="w-5 h-5" />
+          <IoGitCompareOutline className="w-5 h-5 mr-1" />
+          Diff
         </button>
         <button
           onClick={handleOpenChat}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
           title="Open Chat"
         >
-          <LiaComments className="w-5 h-5" />
+          <IoChatbubbleEllipsesOutline className="w-5 h-5 mr-1" />
+          Chat
         </button>
       </div>
 

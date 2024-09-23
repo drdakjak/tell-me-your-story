@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { post } from 'aws-amplify/api';
+import { IoCloseOutline, IoRefreshOutline, IoSendOutline } from 'react-icons/io5';
 
 interface ChatWindowProps {
   section: any;
@@ -21,9 +22,9 @@ interface AIResponse {
 
 const WritingAnimation: React.FC = () => (
   <div className="flex items-center space-x-1">
-    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
   </div>
 );
 
@@ -60,10 +61,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
     return message;
   };
+
   const invokeChat = async () => {
     setIsWaiting(true);
     try {
-      const restOperation =  post({
+      const restOperation = post({
         apiName: 'Api',
         path: 'invoke_chat',
         options: {
@@ -83,7 +85,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           }
           return message;
         });
-        setMessages(formattedResponse); // Pass the correctly typed array to setMessages
+        setMessages(formattedResponse);
       }
     } catch (error) {
       console.error('Error invoking chat:', error);
@@ -118,9 +120,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setMessages([...messages, newMessage]);
       setInputMessage('');
       setIsWaiting(true);
-      console.log("section.tailoredSection.section_id", section.tailoredSection.section_id);
-      console.log("section.tailoredSection.content", section.tailoredSection.content);
-      console.log(inputMessage);
 
       try {
         const { body } = await post({
@@ -165,39 +164,37 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-md p-4 w-3/4 max-w-2xl">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Chat about: {section.tailoredSection.header}</h3>
-          <div>
+          <h3 className="text-xl font-semibold text-gray-800">Chat about: {section.tailoredSection.header}</h3>
+          <div className="flex space-x-2">
             <button
               onClick={resetChat}
-              className="text-blue-500 hover:text-blue-700 focus:outline-none mr-4"
+              className="text-blue-600 hover:text-blue-800 focus:outline-none transition-colors duration-200"
+              title="Reset Chat"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <IoRefreshOutline className="h-6 w-6" />
             </button>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="text-gray-600 hover:text-gray-800 focus:outline-none transition-colors duration-200"
+              title="Close"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <IoCloseOutline className="h-6 w-6" />
             </button>
           </div>
         </div>
-        <div className="h-64 overflow-y-auto mb-4 p-2 bg-gray-100 rounded">
+        <div className="h-96 overflow-y-auto mb-4 p-4 bg-gray-50 rounded-lg">
           {messages.map((message, index) => (
-            <div key={index} className={`mb-2 ${message.type === 'human' ? 'text-right' : 'text-left'}`}>
-              <span className={`inline-block p-2 rounded-lg ${message.type === 'human' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}>
+            <div key={index} className={`mb-3 ${message.type === 'human' ? 'text-right' : 'text-left'}`}>
+              <span className={`inline-block p-3 rounded-lg ${message.type === 'human' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
                 <ReactMarkdown className="markdown-content">{message.content}</ReactMarkdown>
               </span>
             </div>
           ))}
           {isWaiting && (
-            <div className="text-left mb-2">
-              <span className="inline-block p-2 rounded-lg bg-gray-300">
+            <div className="text-left mb-3">
+              <span className="inline-block p-3 rounded-lg bg-gray-200">
                 <WritingAnimation />
               </span>
             </div>
@@ -210,18 +207,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            className="flex-grow border rounded-l-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-grow border-2 border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Type your message..."
             disabled={isWaiting}
           />
           <button
             onClick={handleSendMessage}
-            className={`bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isWaiting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`bg-blue-600 text-white p-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 ${isWaiting ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isWaiting}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-            </svg>
+            <IoSendOutline className="h-6 w-6" />
           </button>
         </div>
       </div>
