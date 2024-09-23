@@ -146,6 +146,10 @@ Resources:
                 paths:
                   - node_modules/**/*
             appRoot: frontend
+      CustomRules:
+        - Source: "/<*>"
+          Target: "/index.html"
+          Status: "200"
       AccessToken: '{{resolve:secretsmanager:tell-me-your-story-github-token}}'
       EnvironmentVariables:
         - Name: AMPLIFY_MONOREPO_APP_ROOT

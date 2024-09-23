@@ -48,14 +48,14 @@ const Home: React.FC = () => {
                 </div>
                 {showButton ? (
                     <button
-                        className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105"
+                        className="h-12 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105"
                         onClick={handleStartClick}
                     >
                         Get Started
                         <IoArrowForward className="ml-2 -mr-1 h-5 w-5" />
                     </button>
                     ) : (
-                        <div className="h-14"></div> // Placeholder with the same height as the button
+                        <div className="h-12"></div> // Placeholder with the same height as the button
                     )}
             </div>
         </div>

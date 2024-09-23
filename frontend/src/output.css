@@ -3735,6 +3735,10 @@ body{
   opacity: 0.75;
 }
 
+.opacity-100{
+  opacity: 1;
+}
+
 .mix-blend-lighten{
   mix-blend-mode: lighten;
 }
