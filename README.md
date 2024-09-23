@@ -1,6 +1,6 @@
 # AI-Powered Resume Tailoring Application
 
-Welcome to the AI-Powered Resume Tailoring Application repository. This application leverages the power of OpenAI, AWS Lambda, AWS Secrets Manager, and AWS Amplify to provide a scalable and secure solution for tailoring resumes to specific job posts.
+"Tell Me Your Story" is the AI-Powered Resume Tailoring Application repository. This application leverages the power of OpenAI, AWS Lambda, AWS Secrets Manager, and AWS Amplify to provide a scalable and secure solution for tailoring resumes to specific job posts.
 
 ## Features
 
