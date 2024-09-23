@@ -6,6 +6,7 @@ import { IoChevronForwardOutline, IoCloudUploadOutline, IoSparklesSharp } from "
 import { HiFire } from "react-icons/hi";
 import FileUpload from '../components/FileUpload';
 import { Accordion } from 'flowbite-react';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ResumeProcessorProps {
@@ -29,6 +30,7 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({
   const [error, setError] = useState('');
   const [isFileInput, setIsFileInput] = useState<boolean>(!Boolean(analyzedResume) && false);
   const [isFileInputCall, setIsFileInputCall] = useState(false);
+  const navigate = useNavigate();
 
   const fetchResume = async () => {
     setIsFileInputCall(true);
@@ -191,7 +193,10 @@ const ResumeProcessor: React.FC<ResumeProcessorProps> = ({
 
             <div className="mt-6 flex justify-center">
               <button
-                onClick={() => setCurrentPage("Editor")}
+                onClick={() => {
+                  setCurrentPage('Editor');
+                  navigate("/editor")
+                }}
                 className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out flex items-center"
               >
                 Next

@@ -48,10 +48,10 @@ const App: React.FC<AppProps> = ({ signOut }) => {
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-secondary-50">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/job-post/" element={<Layout signOut={signOut} />} />
-          <Route path="/resume/" element={<Layout signOut={signOut} />} />
-          <Route path="/editor/" element={<Layout signOut={signOut} />} />
-          <Route path="/tailored-resume/" element={<Layout signOut={signOut} />} />
+          <Route path="/job-post" element={<Layout signOut={signOut} />} />
+          <Route path="/resume" element={<Layout signOut={signOut} />} />
+          <Route path="/editor" element={<Layout signOut={signOut} />} />
+          <Route path="/tailored-resume" element={<Layout signOut={signOut} />} />
         </Routes>
       </div>
     </Router>

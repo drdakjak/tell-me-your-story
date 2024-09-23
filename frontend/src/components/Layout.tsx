@@ -79,11 +79,11 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
   }, [location, setCurrentPage]);
 
   const navigation = useMemo(() => [
-    { name: 'Job Post', icon: PiBriefcaseLight, action: () => setCurrentPage('Job Post'), disabled: false },
-    { name: 'Resume', icon: PiUserCircleThin, action: () => setCurrentPage('Resume'), disabled: !analyzedJobPost },
-    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => setCurrentPage('Editor'), disabled: !analyzedJobPost || !analyzedResume.length },
-    { name: 'Tailored Resume', icon: PiClipboardTextLight, action: () => setCurrentPage('Tailored Resume'), disabled: !analyzedJobPost || !analyzedResume || !tailoredSections.length },
-  ], [analyzedJobPost, analyzedResume, tailoredSections, setCurrentPage]);
+    { name: 'Job Post', icon: PiBriefcaseLight, action: () => navigate('/job-post'), disabled: false },
+    { name: 'Resume', icon: PiUserCircleThin, action: () => navigate('/resume'), disabled: !analyzedJobPost },
+    { name: 'Editor', icon: HiAdjustmentsVertical, action: () => navigate('/editor'), disabled: !analyzedJobPost || !analyzedResume.length },
+    { name: 'Tailored Resume', icon: PiClipboardTextLight, action: () => navigate('/tailored-resume'), disabled: !analyzedJobPost || !analyzedResume || !tailoredSections.length },
+  ], [analyzedJobPost, analyzedResume, tailoredSections, navigate]);
 
   const currentPageIndex = navigation.findIndex(item => item.name === currentPage);
 
