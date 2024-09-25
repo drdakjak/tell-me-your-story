@@ -22,9 +22,10 @@ USE MAXIMALLY 300 WORDS FOR TAILORED SECTION. Use maximally three or less bullet
 Include only highligts from each section that are relevant to the job requirements.
 You can use the other sections of the original resume to enhance the tailored section.
 
-**Contstraints:**
-You are NOT ALLOWED to twist, exaggerate or make up any information which is not present in the original resume.
-You can assume that candidate has other skills, responsibilities and experiences typical for the job position \
+**Constraints:**
+1. You are NOT ALLOWED to twist, exaggerate or make up any information which is not present in the original resume.
+2. Don't try to fit the resume at any cost. If the resume is not a good fit, don't make anything up.
+3. You can assume that candidate has other skills, responsibilities and experiences typical for the job position \
 but this assumption MUST be tagged as "ASSUMPTION:" followed by the relevant assumed text.
 
 
