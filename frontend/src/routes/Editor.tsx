@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { post } from '@aws-amplify/api';
 import Render from '../components/SectionsRender';
 import { IoChevronForwardOutline } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
 
 interface Section {
     header: string;
@@ -35,6 +36,7 @@ const Editor: React.FC<EditorProps> = ({
 }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const optimiseResume = async () => {
         setIsLoading(true);
@@ -104,7 +106,10 @@ const Editor: React.FC<EditorProps> = ({
                     </div>
                     <div className="px-6 py-4 bg-gray-50 flex justify-center">
                         <button
-                            onClick={() => setCurrentPage("Tailored Resume")}
+                            onClick={() => {
+                                setCurrentPage('Tailored Resume');
+                                navigate("/tailored-resume")
+                            }}
                             className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out flex items-center"
                         >
                             Next

@@ -36,15 +36,15 @@
   }
 
   .markdown-content h1 {
-    @apply text-3xl font-bold mb-4 text-gray-900;
+    @apply text-3xl font-bold mb-4 text-gray-900 mt-2;
   }
 
   .markdown-content h2 {
-    @apply text-2xl font-semibold mb-3 text-gray-900;
+    @apply text-2xl font-semibold mb-3 text-gray-900  mt-4;
   }
 
   .markdown-content h3 {
-    @apply text-xl font-medium mb-2 text-gray-800;
+    @apply text-xl font-medium mb-2 text-gray-800  mt-2;
   }
 
   .markdown-content p {

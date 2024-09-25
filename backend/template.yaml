@@ -20,7 +20,7 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DefinitionBody:
-        openapi: '3.0'
+        openapi: "3.0"
         info: {}
         paths:
           /fetch_job_post:
@@ -110,9 +110,9 @@ Resources:
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       Cors:
-        AllowOrigin: '''*'''
-        AllowHeaders: '''*'''
-        AllowMethods: '''*'''
+        AllowOrigin: "'*'"
+        AllowHeaders: "'*'"
+        AllowMethods: "'*'"
         MaxAge: 5
 
   AmplifyBranch:
@@ -146,11 +146,7 @@ Resources:
                 paths:
                   - node_modules/**/*
             appRoot: frontend
-      CustomRules:
-        - Source: "/<*>"
-          Target: "/index.html"
-          Status: "200"
-      AccessToken: '{{resolve:secretsmanager:tell-me-your-story-github-token}}'
+      AccessToken: "{{resolve:secretsmanager:tell-me-your-story-github-token}}"
       EnvironmentVariables:
         - Name: AMPLIFY_MONOREPO_APP_ROOT
           Value: frontend
@@ -179,7 +175,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Events:
         ApiPOSTFetchJobPost:
           Type: Api
@@ -219,7 +215,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
 
       Policies:
         - DynamoDBCrudPolicy:
@@ -249,7 +245,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Events:
         ApiPOSTuploadresume:
           Type: Api
@@ -289,7 +285,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -325,7 +321,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -354,7 +350,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
           SESSIONTABLE_TABLE_NAME: !Ref SessionTable
           SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
       Events:
@@ -381,7 +377,7 @@ Resources:
   UserTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: UserTable
+      TableName: TellMeYourStoryUserTable
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -397,13 +393,17 @@ Resources:
   SessionTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: SessionTable
+      TableName: TellMeYourStorySessionTable
       AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S
         - AttributeName: SessionId
           AttributeType: S
       KeySchema:
-        - AttributeName: SessionId
+        - AttributeName: UserId
           KeyType: HASH
+        - AttributeName: SessionId
+          KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       ProvisionedThroughput:
@@ -543,7 +543,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
+          OPENAI_API_KEY: "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable

@@ -25,17 +25,18 @@ I'm here to help you tailor this section. I have access to the:
 How can I help you?
 """
 
+
 def format_ai_message(message):
-    return json.dumps({
-        "text": message,
-        "tailored_section": ""
-    })
+    return json.dumps({"text": message, "tailored_section": ""})
 
 
-
-def get_message_history(conversation_id: str):
+def get_message_history(user_id: str, session_id: str):
+    key = {
+        "UserId": user_id,
+        "SessionId": session_id,
+    }
     message_history = DynamoDBChatMessageHistory(
-        table_name=SESSION_TABLE, session_id=str(conversation_id)
+        table_name=SESSION_TABLE, session_id=str(user_id), key=key
     )
     return message_history
 
@@ -53,8 +54,11 @@ def handler(event, context):
         body = json.loads(event["body"])
 
         conversation_id = body["conversationId"]
+        user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
-        message_history = get_message_history(conversation_id)
+        message_history = get_message_history(
+            user_id=user_id, session_id=conversation_id
+        )
         if len(message_history.messages) == 0:
             message_history.add_ai_message(format_ai_message(AI_MESSAGE))
         filtered_messages = filter_messages(message_history.messages)

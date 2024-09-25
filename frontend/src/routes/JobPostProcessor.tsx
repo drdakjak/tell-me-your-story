@@ -5,6 +5,7 @@ import { Switch } from '@headlessui/react';
 import { IoSparklesSharp, IoChevronForwardOutline } from "react-icons/io5";
 import { HiFire } from "react-icons/hi";
 import { Accordion } from 'flowbite-react';
+import { useNavigate } from 'react-router-dom';
 
 
 interface JobPostProcessorProps {
@@ -29,6 +30,7 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({
   const [url, setUrl] = useState('');
   const [isUrlInput, setIsUrlInput] = useState<boolean>(!Boolean(analyzedJobPost) && false);
   const [isFetchUrlCall, setIsFetchUrlCall] = useState(false);
+  const navigate = useNavigate();
 
   const fetchJobPost = async () => {
     setIsFetchUrlCall(true);
@@ -176,7 +178,10 @@ const JobPostProcessor: React.FC<JobPostProcessorProps> = ({
 
             <div className="mt-6 flex justify-center">
               <button
-                onClick={() => setCurrentPage("Resume")}
+                onClick={() => {
+                  setCurrentPage('Resume');
+                  navigate("/resume")
+                }}
                 className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out flex items-center"
               >
                 Next
