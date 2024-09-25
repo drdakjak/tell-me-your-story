@@ -23,9 +23,9 @@ Include only highligts from each section that are relevant to the job requiremen
 You can use the other sections of the original resume to enhance the tailored section.
 
 **Contstraints:**
-You can use ONLY the information provided in the original resume. Don't twist the facts.
+You are NOT ALLOWED to twist, exaggerate or make up any information which is not present in the original resume.
 You can assume that candidate has other skills, responsibilities and experiences typical for the job position \
-but this assumption MUST be tagged as "ASSUMPTION:" in the tailored section.
+but this assumption MUST be tagged as "ASSUMPTION:" followed by the relevant assumed text.
 
 
 **JOB REQUIREMENTS:**
