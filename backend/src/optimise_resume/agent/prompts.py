@@ -24,7 +24,7 @@ You can use the other sections of the original resume to enhance the tailored se
 
 **Contstraints:**
 You can use ONLY the information provided in the original resume. Don't twist the facts.
-You can assume that candidate has other skills and experiences typical for the job position \
+You can assume that candidate has other skills, responsibilities and experiences typical for the job position \
 but this assumption MUST be tagged as "ASSUMPTION:" in the tailored section.
 
 
