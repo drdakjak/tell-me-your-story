@@ -74,8 +74,8 @@ You can test the Lambda function locally using the AWS SAM CLI.
     {
         "Parameters": {
             "OPENAI_API_KEY": your OpenAI API key,
-            "SESSIONTABLE_TABLE_NAME": "SessionTable",
-            "USERTABLE_TABLE_NAME": "UserTable"
+            "SESSIONTABLE_TABLE_NAME": "TellMeYourStorySessionTable",
+            "USERTABLE_TABLE_NAME": "TellMeYourStoryUserTable"
         }
     }
     ```

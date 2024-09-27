@@ -1,7 +1,9 @@
 import json
+import sys
 
-from processor import resume_parser
 from clients import get_user_table
+from processor import resume_parser
+
 
 user_table = get_user_table()
 

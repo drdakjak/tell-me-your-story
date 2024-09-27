@@ -1,4 +1,3 @@
-import os
 import json
 
 from langchain_core.output_parsers import JsonOutputParser
@@ -10,30 +9,14 @@ from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import ConfigurableFieldSpec
 
-from dotenv import load_dotenv
 
 from prompt import INIT_PROMPT
 from config import MODEL_NAME
-from clients import get_user_table
+from clients import get_user_table, get_model
+from message_history import get_message_history
 
-
-load_dotenv()
-
-SESSION_TABLE = os.environ["SESSIONTABLE_TABLE_NAME"]
 
 user_table = get_user_table()
-
-
-def get_message_history(user_id: str, session_id: str):
-    key = {
-        "UserId": user_id,
-        "SessionId": session_id,
-    }
-    message_history = DynamoDBChatMessageHistory(
-        table_name=SESSION_TABLE, session_id=str(user_id), key=key
-    )
-    return message_history
-
 
 def handler(event, context):
     try:
@@ -55,11 +38,7 @@ def handler(event, context):
             """
             return original_resume
 
-        llm = ChatOpenAI(
-            model=MODEL_NAME,
-            api_key=os.environ["OPENAI_API_KEY"],
-            temperature=0.0000001,
-        )
+        llm = get_model(MODEL_NAME)
 
         tools = [get_resume]
         llm_with_tools = llm.bind_tools(tools)

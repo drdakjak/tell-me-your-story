@@ -52,7 +52,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
 
   useEffect(() => {
     const initialize = async () => {
-      await initDemoUser();
+      // await initDemoUser();
       await fetchUser();
     };
     initialize();

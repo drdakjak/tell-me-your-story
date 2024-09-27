@@ -20,7 +20,7 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DefinitionBody:
-        openapi: "3.0"
+        openapi: '3.0'
         info: {}
         paths:
           /fetch_job_post:
@@ -110,9 +110,9 @@ Resources:
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       Cors:
-        AllowOrigin: "'*'"
-        AllowHeaders: "'*'"
-        AllowMethods: "'*'"
+        AllowOrigin: '''*'''
+        AllowHeaders: '''*'''
+        AllowMethods: '''*'''
         MaxAge: 5
 
   AmplifyBranch:
@@ -146,7 +146,7 @@ Resources:
                 paths:
                   - node_modules/**/*
             appRoot: frontend
-      AccessToken: "{{resolve:secretsmanager:tell-me-your-story-github-token}}"
+      AccessToken: '{{resolve:secretsmanager:tell-me-your-story-github-token}}'
       EnvironmentVariables:
         - Name: AMPLIFY_MONOREPO_APP_ROOT
           Value: frontend
@@ -158,6 +158,19 @@ Resources:
           Value: !Ref CognitoUserPool
         - Name: VITE_USER_POOL_CLIENT_ID
           Value: !Ref CognitoUserPoolClient
+
+
+  SharedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: shared-layer
+      Description: Shared code for Lambda functions
+      ContentUri: src/shared/
+      CompatibleRuntimes:
+        - python3.11
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.11
 
   FetchJobPost:
     Type: AWS::Serverless::Function
@@ -175,7 +188,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Events:
         ApiPOSTFetchJobPost:
           Type: Api
@@ -185,6 +198,8 @@ Resources:
             RestApiId: !Ref Api
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   FetchJobPostLogGroup:
     Type: AWS::Logs::LogGroup
@@ -215,13 +230,15 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
 
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   ProcessJobPostLogGroup:
     Type: AWS::Logs::LogGroup
@@ -245,7 +262,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Events:
         ApiPOSTuploadresume:
           Type: Api
@@ -255,12 +272,16 @@ Resources:
             RestApiId: !Ref Api
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   UploadResumeLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${UploadResume}
+
+ 
 
   ProcessResume:
     Type: AWS::Serverless::Function
@@ -274,6 +295,8 @@ Resources:
       MemorySize: 128
       Timeout: 100
       Tracing: Active
+      Layers:
+        - !Ref SharedLayer
       Events:
         ApiPOSTprocessresume:
           Type: Api
@@ -285,7 +308,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -321,12 +344,14 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: !Sub "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   OptimiseResumeLogGroup:
     Type: AWS::Logs::LogGroup
@@ -350,7 +375,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
           SESSIONTABLE_TABLE_NAME: !Ref SessionTable
           SESSIONTABLE_TABLE_ARN: !GetAtt SessionTable.Arn
       Events:
@@ -367,6 +392,8 @@ Resources:
             TableName: !Ref UserTable
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   ChatResumeLogGroup:
     Type: AWS::Logs::LogGroup
@@ -483,6 +510,8 @@ Resources:
             RestApiId: !Ref Api
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   InvokeChatLogGroup:
     Type: AWS::Logs::LogGroup
@@ -518,6 +547,8 @@ Resources:
             RestApiId: !Ref Api
       Architectures:
         - arm64
+      Layers:
+        - !Ref SharedLayer
 
   ResetChatLogGroup:
     Type: AWS::Logs::LogGroup
@@ -543,7 +574,7 @@ Resources:
         Variables:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
-          OPENAI_API_KEY: "{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}"
+          OPENAI_API_KEY: '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -554,6 +585,8 @@ Resources:
             Path: /tailored_resume
             Method: GET
             RestApiId: !Ref Api
+      Layers:
+        - !Ref SharedLayer
 
   TailoredResumeGeneratorLogGroup:
     Type: AWS::Logs::LogGroup
@@ -589,6 +622,8 @@ Resources:
             Path: /update_tailored_section
             Method: PUT
             RestApiId: !Ref Api
+      Layers:
+        - !Ref SharedLayer
 
   UpdateTailoredSectionLogGroup:
     Type: AWS::Logs::LogGroup
@@ -624,6 +659,8 @@ Resources:
             Path: /update_user
             Method: PUT
             RestApiId: !Ref Api
+      Layers:
+        - !Ref SharedLayer
 
   UpdateUserLogGroup:
     Type: AWS::Logs::LogGroup
@@ -659,6 +696,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
+      Layers:
+        - !Ref SharedLayer
 
   FetchUserLogGroup:
     Type: AWS::Logs::LogGroup
@@ -671,7 +710,6 @@ Metadata:
     Group:
       Label: API
       Members:
-        - FetchJobPost
         - ProcessJobPost
         - UploadResume
         - ProcessResume
@@ -683,6 +721,7 @@ Metadata:
         - UpdateTailoredSection
         - UpdateUser
         - FetchUser
+        - FetchJobPost
 
 Outputs:
   CognitoUserPool:

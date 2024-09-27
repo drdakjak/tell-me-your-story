@@ -26,6 +26,6 @@ def resume_parser(resume):
     ]
 
     sections_structured = model.with_structured_output(Sections).invoke(messages)
-    sections = sections_structured.dict()['sections']
+    sections = sections_structured.dict()["sections"]
     
     return sections
