@@ -163,6 +163,9 @@ Resources:
   SharedLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
+      CompatibleArchitectures:
+        - arm64
+        - x86_64
       LayerName: shared-layer
       Description: Shared code for Lambda functions
       ContentUri: src/shared/
@@ -231,7 +234,6 @@ Resources:
           USERTABLE_TABLE_NAME: !Ref UserTable
           USERTABLE_TABLE_ARN: !GetAtt UserTable.Arn
           OPENAI_API_KEY: !Sub '{{resolve:secretsmanager:dev/TellMeYourStory:SecretString:OPENAI_API_KEY}}'
-
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable

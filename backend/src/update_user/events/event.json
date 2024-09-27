@@ -1,5 +1,5 @@
 {
-    "body": "{\"jobPost\": \"bla\", \"analyzedJobPost\": \"bla\", \"originalResume\": \"bla\", \"originalSections\": \"bla\", \"tailoredSections\": \"bla\"}",
+    "body": "{\"jobPost\": \"bla\", \"analyzedJobPost\": \"bla\", \"originalResume\": \"bla\", \"originalSections\": \"bla\", \"tailoredSections\": \"bla\", \"tailoredResume\": \"bla\"}",
     "requestContext": {
         "authorizer": {
             "claims": {
