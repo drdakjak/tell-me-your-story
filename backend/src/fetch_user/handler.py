@@ -9,6 +9,16 @@ user_table = get_user_table()
 
 # @logger.inject_lambda_context(log_event=True)
 def handler(event, context):
+    """
+    AWS Lambda handler function to return user data requests.
+
+    Args:
+        event (dict): The event dictionary containing request data.
+        context (object): The context object providing runtime information.
+
+    Returns:
+        dict: The response dictionary containing the status code, headers, and body.
+    """
     try:
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
         logger.info({'user_id': user_id, 'content': f'Loading data for user {user_id}'})

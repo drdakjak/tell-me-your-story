@@ -66,16 +66,7 @@ def get_config(user_id, conversation_id):
     return {"configurable": {"session_id": conversation_id, "user_id": user_id}}
 
 
-def init_system_prompt(original_section, tailored_section, job_requirements):
-    system_prompt = INIT_PROMPT.format(
-        original_section=original_section,
-        tailored_section=tailored_section,
-        job_requirements=job_requirements,
-    )
-    return system_prompt
-
-
-def invoke_chain(chain_with_chat_history, user_message, config):
+def get_response_to_user_message(chain_with_chat_history, user_message, config):
     response = chain_with_chat_history.invoke(
         {
             "user_message": user_message,
@@ -85,7 +76,26 @@ def invoke_chain(chain_with_chat_history, user_message, config):
     return response
 
 
-def process_tool_call(response, user_id, conversation_id, system_prompt, model):
+def get_chain_with_chat_history(chain_prompt, model_with_tools):
+    chain = chain_prompt | model_with_tools
+    chain_with_chat_history = init_chain_history(chain)
+    return chain_with_chat_history
+
+    return chain_with_chat_history
+
+
+def init_system_prompt(original_section, tailored_section, job_requirements):
+    system_prompt = INIT_PROMPT.format(
+        original_section=original_section,
+        tailored_section=tailored_section,
+        job_requirements=job_requirements,
+    )
+    return system_prompt
+
+
+def get_response_to_user_with_tool_call(
+    response, user_id, conversation_id, system_prompt, model
+):
     for tool_call in response.tool_calls:
         selected_tool = eval(tool_call["name"].lower())
         tool_msg = selected_tool.invoke(tool_call)
@@ -110,6 +120,20 @@ def get_resume() -> str:
 
 # @logger.inject_lambda_context(log_event=True)
 def handler(event, context):
+    """
+    AWS Lambda handler function to process a user's request to invoke a chat
+    model with specific sections of a resume and job requirements.
+
+    Args:
+        event (dict): The event dictionary containing the request data.
+        context (object): The context object containing runtime information.
+
+    Raises:
+        ValueError: If the event body is missing required fields.
+
+    Returns:
+        dict: The response from invoking the chain.
+    """
     try:
         body = json.loads(event["body"])
         conversation_id = body["conversationId"]
@@ -135,18 +159,23 @@ def handler(event, context):
         chain_prompt = init_chain_prompt(
             original_section, tailored_section, job_requirements
         )
-        chain = chain_prompt | model_with_tools
 
-        chain_with_chat_history = init_chain_history(chain)
+        chain_with_chat_history = get_chain_with_chat_history(
+            chain_prompt, model_with_tools
+        )
 
+        # Get the response to the user message
         config = get_config(user_id, conversation_id)
-        response = invoke_chain(chain_with_chat_history, user_message, config)
+        response = get_response_to_user_message(
+            chain_with_chat_history, user_message, config
+        )
 
+        # If the response contains tool calls, invoke the tools and update the response
         if response.tool_calls:
             system_prompt = init_system_prompt(
                 original_section, tailored_section, job_requirements
             )
-            response = process_tool_call(
+            response = get_response_to_user_with_tool_call(
                 response, user_id, conversation_id, system_prompt, model_with_tools
             )
 

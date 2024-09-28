@@ -49,6 +49,16 @@ def get_tailored_resume(semantic_sections, job_requirements, original_resume):
 
 # @logger.inject_lambda_context(log_event=True)
 def handler(event, context):
+    """
+    Handles the optimization of a user's resume based on job requirements.
+
+    Args:
+        event (dict): The event data containing the response with user resume information.
+        context (object): The context in which the function is called.
+
+    Returns:
+        dict: An HTTP response with status code 200, the response body, and CORS headers.
+    """
     try:
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 

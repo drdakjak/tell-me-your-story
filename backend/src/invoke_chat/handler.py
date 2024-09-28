@@ -34,6 +34,16 @@ def format_messages(messages):
 
 # @logger.inject_lambda_context(log_event=True)
 def handler(event, context):
+    """
+    AWS Lambda handler function to process incoming events, retrieve chat history, filter and format messages, and return them in the response.
+
+    Args:
+        event (dict): The event dictionary containing the request data.
+        context (object): The context object providing information about the invocation, function, and execution environment.
+
+    Returns:
+        dict: A dictionary containing the HTTP status code, headers, and body with the formatted messages or an error message.
+    """
     try:
         body = json.loads(event["body"])
 
@@ -46,9 +56,11 @@ def handler(event, context):
             user_id=user_id, session_id=conversation_id
         )
 
+        # If no messages are found, add a default AI message to the history
         if len(message_history.messages) == 0:
             message_history.add_ai_message(format_ai_message(AI_MESSAGE))
 
+        # Filter the messages to include only human and AI messages
         filtered_messages = filter_messages(message_history.messages)
         formated_filtered_messages = format_messages(filtered_messages)
 
