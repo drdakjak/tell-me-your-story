@@ -8,8 +8,8 @@ def handler(event, context):
     try:
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
         response = user_table.get_item(Key={"id": user_id})
-        user_date = response["Item"]
-
+        user_date = response.get("Item", {})
+        
         return {
                 "statusCode": 200,
                 "body": json.dumps(user_date),

@@ -12,7 +12,7 @@ import { HiAdjustmentsVertical } from "react-icons/hi2";
 import avatar from 'animal-avatar-generator';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { get } from 'aws-amplify/api';
-import initDemoUser from './InitUserData';
+// import initDemoUser from './InitUserData';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
