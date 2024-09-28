@@ -1,11 +1,10 @@
 import json
-import logging
+from aws_lambda_powertools import Logger
 
-from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from message_history import get_message_history
+from common_config import LOGGING_LEVEL
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger = Logger(level=LOGGING_LEVEL)
 
 
 AI_MESSAGE = """
@@ -33,21 +32,26 @@ def filter_messages(messages):
 def format_messages(messages):
     return [{"type": msg.type, "content": msg.content} for msg in messages]
 
-
+# @logger.inject_lambda_context(log_event=True)
 def handler(event, context):
     try:
         body = json.loads(event["body"])
 
         conversation_id = body["conversationId"]
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
-
+        
+        logger.info({'user_id': user_id, 'content': f'Loading chat history for conversation_id {conversation_id}'})
+        
         message_history = get_message_history(
             user_id=user_id, session_id=conversation_id
         )
+
         if len(message_history.messages) == 0:
             message_history.add_ai_message(format_ai_message(AI_MESSAGE))
+
         filtered_messages = filter_messages(message_history.messages)
         formated_filtered_messages = format_messages(filtered_messages)
+
         return {
             "statusCode": 200,
             "headers": {
@@ -58,6 +62,7 @@ def handler(event, context):
             "body": json.dumps(formated_filtered_messages),
         }
     except Exception as e:
+        logger.error("An error occurred", exc_info=e)
         return {
             "statusCode": 500,
             "headers": {
@@ -65,5 +70,5 @@ def handler(event, context):
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "*",
             },
-            "body": json.dumps(e.__repr__()),
+            "body": json.dumps({"error": str(e)})
         }
