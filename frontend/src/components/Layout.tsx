@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { Disclosure, Menu } from '@headlessui/react';
+import { Disclosure, DisclosurePanel, DisclosureButton, Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import JobPostProcessor from '../routes/JobPostProcessor';
 import ResumeProcessor from '../routes/ResumeProcessor';
@@ -131,13 +131,13 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                 <div className="hidden sm:ml-6 sm:flex sm:items-center">
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      <MenuButton className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         <img className="h-8 w-8 rounded-full" src={userAvatar} alt="" />
-                      </Menu.Button>
+                      </MenuButton>
                     </div>
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
+                    <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <MenuItem>
                         {({ active }) => (
                           <button
                             onClick={signOut}
@@ -149,27 +149,27 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                             Sign out
                           </button>
                         )}
-                      </Menu.Item>
-                    </Menu.Items>
+                      </MenuItem>
+                    </MenuItems>
                   </Menu>
                 </div>
                 <div className="-mr-2 flex items-center sm:hidden">
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                  <DisclosureButton className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                     ) : (
                       <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                     )}
-                  </Disclosure.Button>
+                  </DisclosureButton>
                 </div>
               </div>
             </div>
 
-            <Disclosure.Panel className="sm:hidden">
+            <DisclosurePanel className="sm:hidden">
               <div className="space-y-1 pb-3 pt-2">
                 {navigation.map((item) => (
-                  <Disclosure.Button
+                  <DisclosureButton
                     key={item.name}
                     as="a"
                     onClick={() => !item.disabled && item.action()}
@@ -183,7 +183,7 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                     )}
                   >
                     {item.name}
-                  </Disclosure.Button>
+                  </DisclosureButton>
                 ))}
               </div>
               <div className="border-t border-gray-200 pb-3 pt-4">
@@ -197,16 +197,16 @@ const Layout: React.FC<{ signOut: () => void }> = ({ signOut }) => {
                   </div>
                 </div>
                 <div className="mt-3 space-y-1">
-                  <Disclosure.Button
+                  <DisclosureButton
                     as="button"
                     onClick={signOut}
                     className="block w-full px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                   >
                     Sign out
-                  </Disclosure.Button>
+                  </DisclosureButton>
                 </div>
               </div>
-            </Disclosure.Panel>
+            </DisclosurePanel>
           </>
         )}
       </Disclosure>
