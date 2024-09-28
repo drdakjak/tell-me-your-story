@@ -84,3 +84,6 @@ def test_handler_general_exception(mock_user_table, event, context):
     
     assert response["statusCode"] == 500
     assert json.loads(response["body"]) == {"error": "Something went wrong"}
+
+if __name__ == "__main__":
+    pytest.main()

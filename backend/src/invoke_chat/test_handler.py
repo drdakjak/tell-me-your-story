@@ -115,3 +115,6 @@ def test_handler_missing_user_id(event, context):
     
     assert response["statusCode"] == 500
     assert "error" in json.loads(response["body"])
+
+if __name__ == "__main__":
+    pytest.main()

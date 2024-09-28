@@ -73,3 +73,7 @@ def test_update_section():
         {"section_id": "section_1", "content": "Updated content"},
         {"section_id": "section_2", "content": "Old content"},
     ]
+
+
+if __name__ == "__main__":
+    pytest.main()
